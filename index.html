@@ -1,0 +1,3109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team-Sync AI Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1200px;
+            width: 90%;
+            padding: 40px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .slack-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            text-align: right;
+        }
+        
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .settings-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            color: #666;
+        }
+        
+        .settings-btn:hover {
+            background: #f3f4f6;
+        }
+        
+        /* Dashboard View */
+        .dashboard-view {
+            display: block;
+        }
+        
+        .create-team-section {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .create-team-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .create-team-header h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .create-team-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .team-form {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .quiz-type-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .quiz-type-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .quiz-type-btn.active {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
+        
+        .quiz-type-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .quiz-type-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .quiz-type-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .input-with-suggestion {
+            position: relative;
+            flex: 1;
+            display: flex;
+        }
+        
+        .team-name-input.compact {
+            flex: 1;
+            padding: 10px 12px;
+            padding-right: 180px;
+            font-size: 15px;
+        }
+        
+        .inline-suggestion {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+            color: #999;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        
+        .inline-suggestion strong {
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        
+        .inline-suggestion strong:hover {
+            color: #5a67d8;
+            text-decoration: underline;
+        }
+        
+        .team-name-input.compact:focus + .inline-suggestion,
+        .team-name-input.compact:not(:placeholder-shown) + .inline-suggestion {
+            opacity: 0;
+        }
+        
+        .compact-name-group {
+            margin-bottom: 20px;
+        }
+        
+        .team-name-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .inline-label {
+            min-width: 100px;
+            margin-bottom: 0;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .compact-refresh {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .compact-refresh:hover {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+        
+        .name-suggestion.compact {
+            margin-top: 6px;
+            margin-left: 112px;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .suggestion-text strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .team-name-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .team-name-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .name-suggestion {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .refresh-name {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .refresh-name:hover {
+            background: #f3f4f6;
+        }
+        
+        /* Side-by-side member pools */
+        .member-pools-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .freshness-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .legend-dot.fresh {
+            background: #10b981;
+        }
+        
+        .legend-dot.recent {
+            background: #667eea;
+        }
+        
+        .legend-dot.stale {
+            background: #f59e0b;
+        }
+        
+        .legend-dot.old {
+            background: #ef4444;
+        }
+        
+        .legend-label {
+            color: #666;
+        }
+        
+        .member-pool-section {
+            opacity: 0.5;
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        
+        .member-pool-section.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .pool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f3f4f6;
+            border-radius: 10px 10px 0 0;
+            border: 2px solid #e5e7eb;
+            border-bottom: none;
+        }
+        
+        .member-pool-section.active .pool-header {
+            background: linear-gradient(135deg, #ede9fe, #f3f4f6);
+            border-color: #667eea;
+        }
+        
+        .pool-title {
+            font-weight: 600;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .member-pool-section.active .pool-title {
+            color: #667eea;
+        }
+        
+        .pool-badge {
+            padding: 4px 8px;
+            background: #e5e7eb;
+            color: #666;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .member-pool-section.active .pool-badge {
+            background: #667eea;
+            color: white;
+        }
+        
+        .member-search {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e5e7eb;
+            border-top: none;
+            font-size: 14px;
+        }
+        
+        .member-pool-section.active .member-search {
+            border-color: #667eea;
+        }
+        
+        .member-selection {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .member-pool-section.active .member-selection {
+            border-color: #667eea;
+        }
+        
+        .member-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .member-checkbox:hover {
+            background: #f9fafb;
+        }
+        
+        .member-checkbox.selected {
+            background: #ede9fe;
+            border: 1px solid #667eea;
+        }
+        
+        .member-checkbox input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .member-details {
+            flex: 1;
+        }
+        
+        .member-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .dual-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .member-date {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .member-date.fresh {
+            color: #10b981;
+        }
+        
+        .member-date.recent {
+            color: #667eea;
+        }
+        
+        .member-date.stale {
+            color: #f59e0b;
+        }
+        
+        .member-date.old {
+            color: #ef4444;
+        }
+        
+        .selection-counter {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #666;
+            padding: 10px;
+            background: #f3f4f6;
+            border-radius: 8px;
+        }
+        
+        .command-output {
+            background: #1e1e1e;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+        
+        .command-text {
+            word-break: break-all;
+            line-height: 1.5;
+        }
+        
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .copy-button:hover {
+            background: #5a67d8;
+        }
+        
+        .copy-button.copied {
+            background: #10b981;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .help-text {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .existing-teams {
+            margin-top: 40px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .team-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .team-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        
+        .team-info {
+            flex: 1;
+        }
+        
+        .team-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .team-meta {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .team-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .progress-indicator {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e5e7eb;
+        }
+        
+        .progress-dot.completed {
+            background: #10b981;
+        }
+        
+        .chemistry-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .optimize-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .optimize-btn:hover {
+            background: #5a67d8;
+        }
+        
+        /* Optimizer View */
+        .optimizer-view {
+            display: none;
+        }
+        
+        .optimizer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .back-btn {
+            background: #e9ecef;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: #dee2e6;
+        }
+        
+        .team-chemistry {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .chemistry-score-section {
+            text-align: center;
+        }
+        
+        .chemistry-display {
+            font-size: 72px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .chemistry-label {
+            color: #666;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        
+        .chemistry-explanation {
+            max-width: 400px;
+            padding-left: 30px;
+            border-left: 3px solid #667eea;
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+        
+        .team-zones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .zone {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 250px;
+        }
+        
+        .zone.optimized {
+            background: linear-gradient(135deg, #ede9fe, #f3f4f6);
+            border: 2px solid #667eea;
+        }
+        
+        .zone-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #666;
+        }
+        
+        .zone.optimized .zone-title {
+            color: #667eea;
+            font-weight: 700;
+        }
+        
+        .zone-guidance {
+            color: #999;
+            font-size: 14px;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .team-member {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: move;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .zone.drag-over {
+            background: #e9ecef;
+            border: 2px dashed #667eea;
+        }
+        
+        .subscales {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 0;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .subscales-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            transition: all 0.3s;
+            user-select: none;
+        }
+        
+        .subscales-header:hover {
+            background: linear-gradient(135deg, #e5e7eb, #ddd6fe);
+        }
+        
+        .subscales-header h3 {
+            font-size: 18px;
+            margin: 0;
+            color: #333;
+        }
+        
+        .collapse-icon {
+            font-size: 20px;
+            color: #667eea;
+            transition: transform 0.3s;
+            font-weight: 600;
+        }
+        
+        .subscales.collapsed .collapse-icon {
+            transform: rotate(180deg);
+        }
+        
+        .subscales-content {
+            padding: 0 20px 20px 20px;
+            max-height: 500px;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+        
+        .subscales.collapsed .subscales-content {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        
+        .subscale-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .subscale-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .subscale-name {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .subscale-value {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        .status-message {
+            background: #f0f9ff;
+            border: 1px solid #0284c7;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            color: #075985;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .status-message.show {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .deploy-section {
+            text-align: center;
+            margin: 30px auto;
+        }
+        
+        .deploy-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .deploy-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+        
+        .deploy-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .override-section {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 500px;
+            display: none;
+        }
+        
+        .override-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .override-checkbox input[type="checkbox"] {
+            margin-top: 2px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .override-label {
+            color: #92400e;
+            font-size: 14px;
+            line-height: 1.4;
+            flex: 1;
+        }
+        
+        /* Slack Simulation Window */
+        .slack-simulation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background: rgba(26, 29, 33, 0.65);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            z-index: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .slack-simulation.active {
+            width: 380px;
+            background: rgba(26, 29, 33, 0.85);
+            box-shadow: 0 0 0 3px #667eea, 0 15px 50px rgba(0,0,0,0.4);
+            animation: pulseGlow 2s ease-in-out;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .slack-header {
+            background: rgba(74, 21, 75, 0.7);
+            padding: 12px 15px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .slack-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .slack-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .slack-messages {
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .slack-message {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .slack-bot-name {
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .slack-minimize {
+            cursor: pointer;
+            color: #aaa;
+        }
+        
+        .reset-demo-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .team-chemistry {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .chemistry-explanation {
+                padding-left: 0;
+                padding-top: 20px;
+                border-left: none;
+                border-top: 3px solid #667eea;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Dashboard View -->
+        <div id="dashboardView" class="dashboard-view">
+            <div class="header">
+                <div class="logo-section">
+                    <div class="logo">
+                        <div class="logo-text">Team-Sync AI</div>
+                        <div class="logo-subtitle">2-Minute Quiz → Instant Chemistry Score</div>
+                    </div>
+                    <div class="slack-status">
+                        <div class="status-dot"></div>
+                        <span style="font-size: 13px; color: #059669; font-weight: 500;">Connected to Slack</span>
+                    </div>
+                </div>
+                <div class="user-section">
+                    <div class="user-info">
+                        <div class="user-name">Hello Hannah R</div>
+                        <div class="user-role">HR Manager</div>
+                    </div>
+                    <div class="user-avatar">HR</div>
+                    <button class="settings-btn" title="Settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 1.54l4.24 4.24M20.46 20.46l-4.24-4.24M1.54 20.46l4.24-4.24M23 12h-6m-6 0H1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Create New Team Section -->
+            <div class="create-team-section">
+                <div class="create-team-header">
+                    <h2>Create New Team Assessment</h2>
+                    <p>Select assessment type, name your team, and generate the Slack command</p>
+                </div>
+                
+                <div class="team-form">
+                    <!-- Quiz Type Selection -->
+                    <div class="form-group">
+                        <label class="form-label">Select Assessment Type</label>
+                        <div class="quiz-type-selector">
+                            <div class="quiz-type-btn active" onclick="selectQuizType('team')" id="teamQuizBtn">
+                                <div class="quiz-type-title">Team Chemistry</div>
+                                <div class="quiz-type-desc">3-8 members working together</div>
+                            </div>
+                            <div class="quiz-type-btn" onclick="selectQuizType('dyad')" id="dyadQuizBtn">
+                                <div class="quiz-type-title">Dyad Partnership</div>
+                                <div class="quiz-type-desc">2 members partnership assessment</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Name -->
+                    <div class="form-group compact-name-group">
+                        <div class="team-name-row">
+                            <label class="form-label inline-label">Team Name</label>
+                            <div class="input-with-suggestion">
+                                <input type="text" class="team-name-input compact" id="teamNameInput" 
+                                       placeholder="Enter team name">
+                                <span class="inline-suggestion" id="inlineSuggestion">or use: <strong>All Systems Go</strong></span>
+                            </div>
+                            <button class="refresh-name compact-refresh" onclick="refreshTeamName()" title="Get new suggestion">↻</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Side-by-side Member Pools -->
+                    <div class="form-group">
+                        <label class="form-label">Select Members from Pool</label>
+                        
+                        <div class="member-pools-container">
+                            <!-- Team Pool -->
+                            <div id="teamPoolSection" class="member-pool-section active">
+                                <div class="pool-header">
+                                    <span class="pool-title">Team Members Pool</span>
+                                    <span class="pool-badge">3-8 MEMBERS</span>
+                                </div>
+                                <input type="text" class="member-search" id="teamMemberSearch" 
+                                       placeholder="Search team members..." onkeyup="filterMembers('team')">
+                                <div class="member-selection" id="teamMemberSelection">
+                                    <!-- Team members will be populated here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Dyad Pool -->
+                            <div id="dyadPoolSection" class="member-pool-section">
+                                <div class="pool-header">
+                                    <span class="pool-title">Dyad Partnership Pool</span>
+                                    <span class="pool-badge">2 MEMBERS</span>
+                                </div>
+                                <input type="text" class="member-search" id="dyadMemberSearch" 
+                                       placeholder="Search dyad members..." onkeyup="filterMembers('dyad')">
+                                <div class="member-selection" id="dyadMemberSelection">
+                                    <!-- Dyad members will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="selection-counter">
+                            <span id="selectedCount">0</span> members selected
+                            <span id="selectionHint" style="margin-left: 10px; color: #666;">(AI will find optimal team of 3-8)</span>
+                        </div>
+                        
+                        <!-- Freshness Legend moved here -->
+                        <div class="freshness-legend">
+                            <div class="legend-item">
+                                <div class="legend-dot fresh"></div>
+                                <span class="legend-label">≤7 days (Current)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot recent"></div>
+                                <span class="legend-label">8-30 days (Recent)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot stale"></div>
+                                <span class="legend-label">31-90 days (Update needed)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot old"></div>
+                                <span class="legend-label">>90 days (Outdated)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Generate Command Button -->
+                    <div class="action-buttons">
+                        <button class="generate-btn" id="generateBtn" onclick="analyzeTeamChemistry()" disabled>
+                            Analyze Team Chemistry
+                        </button>
+                    </div>
+                    
+                    <!-- Processing Status (Hidden initially) -->
+                    <div id="processingStatus" style="display: none;">
+                        <div class="status-message show" style="background: linear-gradient(135deg, #ede9fe, #f3f4f6); border-color: #667eea; color: #667eea;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <div class="status-dot" style="background: #667eea;"></div>
+                                <span id="statusText">Analyzing team composition...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Command Output (Hidden initially) -->
+                    <div id="commandOutput" style="display: none;">
+                        <div class="command-output">
+                            <div class="command-text" id="commandText"></div>
+                            <button class="copy-button" onclick="copyCommand()">Copy</button>
+                        </div>
+                        <div class="help-text">
+                            📋 <strong>Next steps:</strong> Copy this command and paste it in any Slack channel. 
+                            The bot will DM each selected member with a 2-minute chemistry quiz. 
+                            Results will appear here once all members complete their assessments.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Existing Teams Section -->
+            <div class="existing-teams">
+                <h2 class="section-title">Active Team Assessments</h2>
+                
+                <div class="team-card">
+                    <div class="team-info">
+                        <div class="team-name">Mission Success <span id="mission-success-status" style="display: none; background: #10b981; color: white; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-left: 10px; font-weight: 600;">DEPLOYED</span></div>
+                        <div class="team-meta">5 members • Created 2 hours ago</div>
+                    </div>
+                    <div class="team-status">
+                        <div class="progress-indicator">
+                            <div class="progress-dot completed"></div>
+                            <div class="progress-dot completed"></div>
+                            <div class="progress-dot completed"></div>
+                            <div class="progress-dot completed"></div>
+                            <div class="progress-dot completed"></div>
+                        </div>
+                        <button class="chemistry-badge" onclick="showOptimizer('Mission Success', 89)">89% Chemistry</button>
+                    </div>
+                </div>
+                
+                <div class="team-card">
+                    <div class="team-info">
+                        <div class="team-name">Escape Velocity <span id="escape-velocity-status" style="display: none; background: #10b981; color: white; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-left: 10px; font-weight: 600;">DEPLOYED</span></div>
+                        <div class="team-meta">2 members • Dyad • Created today</div>
+                    </div>
+                    <div class="team-status">
+                        <div class="progress-indicator">
+                            <div class="progress-dot completed"></div>
+                            <div class="progress-dot completed"></div>
+                        </div>
+                        <button class="chemistry-badge" onclick="showOptimizer('Escape Velocity', 82, true)">82% Chemistry</button>
+                    </div>
+                </div>
+                
+                <div class="team-card">
+                    <div class="team-info">
+                        <div class="team-name">The Catalysts</div>
+                        <div class="team-meta">3 members • Created yesterday</div>
+                    </div>
+                    <div class="team-status">
+                        <div class="progress-indicator">
+                            <div class="progress-dot"></div>
+                            <div class="progress-dot"></div>
+                            <div class="progress-dot"></div>
+                        </div>
+                        <button class="optimize-btn">Awaiting Responses</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Optimizer View -->
+        <div id="optimizerView" class="optimizer-view">
+            <div class="optimizer-header">
+                <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
+                <h2 id="optimizerTitle">Team Chemistry Optimizer</h2>
+            </div>
+            
+            <div class="team-chemistry">
+                <div class="chemistry-score-section">
+                    <div class="chemistry-display" id="mainChemistry">89%</div>
+                    <div class="chemistry-label">Overall Team Chemistry</div>
+                </div>
+                <div class="chemistry-explanation">
+                    Answers given to the quiz generate the percentage of time that individuals who work together will spontaneously align with productive chemistry.
+                </div>
+            </div>
+            
+            <div class="status-message" id="optimizerStatus"></div>
+            
+            <div class="team-zones">
+                <div class="zone optimized" id="currentTeam" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="zone-title">Optimized Team</div>
+                    <div id="optimizedMembers">
+                        <!-- Members will be populated dynamically -->
+                    </div>
+                </div>
+                
+                <div class="zone" id="availablePool" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="zone-title">Member Pool</div>
+                    <div id="poolMembers">
+                        <!-- Members will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subscales collapsed" id="subscalesSection">
+                <div class="subscales-header" onclick="toggleSubscales()">
+                    <h3>Team Chemistry Subscale Components</h3>
+                    <span class="collapse-icon">⌃</span>
+                </div>
+                <div class="subscales-content">
+                    <div class="subscale-grid">
+                        <div class="subscale-item">
+                            <span class="subscale-name">Automatic Understanding:</span>
+                            <span class="subscale-value" id="autoScore">87%</span>
+                        </div>
+                        <div class="subscale-item">
+                            <span class="subscale-name">Intuitive Trust:</span>
+                            <span class="subscale-value" id="trustScore">91%</span>
+                        </div>
+                        <div class="subscale-item">
+                            <span class="subscale-name">Instant Feeling at Ease:</span>
+                            <span class="subscale-value" id="easeScore">88%</span>
+                        </div>
+                        <div class="subscale-item">
+                            <span class="subscale-name">Spontaneous Team Integration:</span>
+                            <span class="subscale-value" id="integrationScore">90%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="deploy-section">
+                <div class="override-section" id="overrideSection">
+                    <div class="override-checkbox">
+                        <input type="checkbox" id="overrideCheckbox" onchange="toggleOverride()">
+                        <label for="overrideCheckbox" class="override-label">
+                            This is not the AI-optimized configuration, but I approve this alternative selection.
+                        </label>
+                    </div>
+                </div>
+                <button class="deploy-btn" id="deployBtn" onclick="deployTeam()" disabled>Deploy Optimized Team</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slack Simulation Window -->
+    <div class="slack-simulation" id="slackSimulation">
+        <div class="slack-header">
+            <div class="slack-header-left">
+                <svg class="slack-icon" viewBox="0 0 24 24" fill="none">
+                    <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z" fill="#E01E5A"/>
+                    <path d="M8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312z" fill="#36C5F0"/>
+                    <path d="M18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.27 0a2.528 2.528 0 0 1-2.522 2.521 2.527 2.527 0 0 1-2.521-2.521V2.522A2.527 2.527 0 0 1 15.164 0a2.528 2.528 0 0 1 2.522 2.522v6.312z" fill="#2EB67D"/>
+                    <path d="M15.164 18.956a2.528 2.528 0 0 1 2.522 2.522A2.528 2.528 0 0 1 15.164 24a2.527 2.527 0 0 1-2.521-2.522v-2.522h2.521zm0-1.27a2.527 2.527 0 0 1-2.521-2.522 2.527 2.527 0 0 1 2.521-2.521h6.313A2.528 2.528 0 0 1 24 15.164a2.528 2.528 0 0 1-2.522 2.522h-6.314z" fill="#ECB22E"/>
+                </svg>
+                <span>Slack Activity</span>
+            </div>
+            <span class="slack-minimize" onclick="toggleSlack()">─</span>
+        </div>
+        <div class="slack-messages" id="slackMessages">
+            <div class="slack-message">
+                <div class="slack-bot-name">Team-Sync Bot</div>
+                Ready to send quiz invitations...
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // SpaceX-style team names
+        const teamNames = [
+            "All Systems Go",
+            "Escape Velocity", 
+            "Mission Success",
+            "The Catalysts",
+            "Optimal Configuration",
+            "Peak Performance",
+            "Full Throttle",
+            "Maximum Efficiency Achieved",
+            "Operating at Capacity",
+            "Launch Sequence Initiated",
+            "Synchronization Complete",
+            "The Golden Record",
+            "Hypothesis Confirmed",
+            "Results: Reproducible",
+            "The Proof of Concept",
+            "Five Star Review",
+            "Achievement Unlocked",
+            "Version Final",
+            "The Resonance",
+            "Perfect Pitch"
+        ];
+        
+        // Define member pools with Mental Synchrony profiles from quiz responses
+        const memberPools = {
+            team: [
+                { id: 'T001', name: 'Sarah Johnson', initials: 'SJ', quizDate: '2024-12-19', hasDual: true,
+                  msScore: 72, subscales: { understanding: 68, trust: 80, ease: 72, integration: 70 } },
+                { id: 'T002', name: 'Michael Chen', initials: 'MC', quizDate: '2024-12-18',
+                  msScore: 68, subscales: { understanding: 64, trust: 76, ease: 66, integration: 68 } },
+                { id: 'T003', name: 'Emily Parker', initials: 'EP', quizDate: '2024-12-16',
+                  msScore: 78, subscales: { understanding: 76, trust: 82, ease: 80, integration: 74 } },
+                { id: 'T004', name: 'David Wilson', initials: 'DW', quizDate: '2024-12-05',
+                  msScore: 65, subscales: { understanding: 60, trust: 72, ease: 64, integration: 66 } },
+                { id: 'T005', name: 'Jessica Rodriguez', initials: 'JR', quizDate: '2024-11-20',
+                  msScore: 74, subscales: { understanding: 72, trust: 78, ease: 70, integration: 76 } },
+                { id: 'T006', name: 'Robert Kim', initials: 'RK', quizDate: '2024-10-15',
+                  msScore: 61, subscales: { understanding: 56, trust: 68, ease: 60, integration: 62 } },
+                { id: 'T007', name: 'Amanda Foster', initials: 'AF', quizDate: '2024-09-30',
+                  msScore: 70, subscales: { understanding: 68, trust: 74, ease: 66, integration: 72 } },
+                { id: 'T008', name: 'Alex Thompson', initials: 'AT', quizDate: '2024-08-01', hasDual: true,
+                  msScore: 76, subscales: { understanding: 80, trust: 72, ease: 78, integration: 74 } },
+                { id: 'T009', name: 'Sophie Lee', initials: 'SL', quizDate: '2024-06-15', hasDual: true,
+                  msScore: 58, subscales: { understanding: 54, trust: 66, ease: 56, integration: 58 } },
+                { id: 'T010', name: 'Kevin Brown', initials: 'KB', quizDate: null,
+                  msScore: 52, subscales: { understanding: 48, trust: 58, ease: 50, integration: 52 } }
+            ],
+            dyad: [
+                { id: 'D001', name: 'Alex Thompson', initials: 'AT', quizDate: '2024-12-19', hasDual: true,
+                  msScore: 76, subscales: { understanding: 80, trust: 72, ease: 78, integration: 74 } },
+                { id: 'D002', name: 'Rachel Smith', initials: 'RS', quizDate: '2024-12-17',
+                  msScore: 71, subscales: { understanding: 70, trust: 76, ease: 68, integration: 72 } },
+                { id: 'D003', name: 'Daniel Martinez', initials: 'DM', quizDate: '2024-12-12',
+                  msScore: 66, subscales: { understanding: 62, trust: 70, ease: 68, integration: 64 } },
+                { id: 'D004', name: 'Sophie Lee', initials: 'SL', quizDate: '2024-11-25', hasDual: true,
+                  msScore: 58, subscales: { understanding: 54, trust: 66, ease: 56, integration: 58 } },
+                { id: 'D005', name: 'Marcus Johnson', initials: 'MJ', quizDate: '2024-11-01',
+                  msScore: 73, subscales: { understanding: 76, trust: 78, ease: 66, integration: 74 } },
+                { id: 'D006', name: 'Nina Patel', initials: 'NP', quizDate: '2024-10-01',
+                  msScore: 79, subscales: { understanding: 82, trust: 84, ease: 72, integration: 78 } },
+                { id: 'D007', name: 'Oliver Chen', initials: 'OC', quizDate: '2024-07-15',
+                  msScore: 60, subscales: { understanding: 58, trust: 64, ease: 62, integration: 56 } },
+                { id: 'D008', name: 'Sarah Johnson', initials: 'SJ', quizDate: '2024-03-20', hasDual: true,
+                  msScore: 72, subscales: { understanding: 68, trust: 80, ease: 72, integration: 70 } }
+            ]
+        };
+        
+        // Mental Synchrony team chemistry calculations
+        function calculateTeamChemistry(members) {
+            if (members.length < 2) return 50;
+            
+            // Calculate average MS score
+            const msScores = members.map(m => m.msScore);
+            const avgMS = msScores.reduce((a, b) => a + b, 0) / msScores.length;
+            
+            // Calculate range factor (optimal range is 15-30 points)
+            const range = Math.max(...msScores) - Math.min(...msScores);
+            let rangeFactor;
+            if (range < 10) {
+                rangeFactor = 0.92; // Too similar, less dynamic
+            } else if (range <= 15) {
+                rangeFactor = 0.98; // Good diversity
+            } else if (range <= 25) {
+                rangeFactor = 1.0; // Optimal diversity
+            } else if (range <= 35) {
+                rangeFactor = 0.95; // Getting too diverse
+            } else {
+                rangeFactor = 0.88; // Too much variance
+            }
+            
+            // Calculate trust foundation (critical for team function)
+            const avgTrust = members.reduce((sum, m) => sum + m.subscales.trust, 0) / members.length;
+            const trustFactor = avgTrust < 60 ? 0.85 : 
+                               avgTrust < 70 ? 0.92 :
+                               avgTrust < 75 ? 1.0 :
+                               1.02; // High trust bonus
+            
+            // Calculate subscale alignment
+            const alignmentScore = calculateSubscaleAlignment(members);
+            
+            // Team size modifier
+            let sizeModifier;
+            if (members.length === 2) {
+                sizeModifier = 0.98; // Dyad
+            } else if (members.length === 3) {
+                sizeModifier = 1.0; // Small team
+            } else if (members.length === 4) {
+                sizeModifier = 1.02; // Optimal team size
+            } else if (members.length === 5) {
+                sizeModifier = 1.0; // Good size
+            } else {
+                sizeModifier = 0.96 - (members.length - 6) * 0.02; // Larger teams have coordination challenges
+            }
+            
+            // Combine factors for final chemistry score
+            const baseScore = (avgMS * 0.6 + alignmentScore * 0.4);
+            const finalScore = baseScore * rangeFactor * trustFactor * sizeModifier;
+            
+            // Ensure realistic range (45-88%)
+            return Math.min(88, Math.max(45, Math.round(finalScore)));
+        }
+        
+        function calculateSubscaleAlignment(members) {
+            const dimensions = ['understanding', 'trust', 'ease', 'integration'];
+            let totalAlignment = 0;
+            
+            dimensions.forEach(dim => {
+                const values = members.map(m => m.subscales[dim]);
+                const avg = values.reduce((a, b) => a + b, 0) / values.length;
+                const variance = values.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / values.length;
+                
+                // Lower variance = better alignment
+                // Variance of 0-100 scaled to alignment score of 100-60
+                const alignmentForDim = Math.max(60, 100 - variance * 0.4);
+                totalAlignment += alignmentForDim;
+            });
+            
+            return totalAlignment / dimensions.length;
+        }
+        
+        function findOptimalTeam(availableMembers, minSize = 3, maxSize = 5) {
+            let bestTeam = [];
+            let bestScore = 0;
+            
+            // Limit the max size based on available members
+            maxSize = Math.min(maxSize, availableMembers.length);
+            
+            // Try different team sizes
+            for (let size = minSize; size <= maxSize; size++) {
+                // Generate combinations
+                const combinations = getCombinations(availableMembers, size);
+                
+                // Check each combination
+                for (let combo of combinations) {
+                    const score = calculateTeamChemistry(combo);
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestTeam = [...combo];
+                    }
+                }
+            }
+            
+            return { team: bestTeam, score: bestScore };
+        }
+        
+        function getCombinations(arr, size) {
+            const result = [];
+            
+            function combine(start, combo) {
+                if (combo.length === size) {
+                    result.push([...combo]);
+                    return;
+                }
+                
+                for (let i = start; i < arr.length; i++) {
+                    combo.push(arr[i]);
+                    combine(i + 1, combo);
+                    combo.pop();
+                }
+            }
+            
+            combine(0, []);
+            return result;
+        }
+        
+        // Global state
+        let currentQuizType = 'team';
+        let selectedMembers = {
+            team: [],
+            dyad: []
+        };
+        let currentSuggestedName = '';
+        let currentTeamName = '';
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            populateBothPools();
+            refreshTeamName();
+            
+            const input = document.getElementById('teamNameInput');
+            input.addEventListener('input', validateForm);
+        });
+        
+        function populateBothPools() {
+            // Populate Team Pool
+            populatePool('team', 'teamMemberSelection');
+            
+            // Populate Dyad Pool
+            populatePool('dyad', 'dyadMemberSelection');
+        }
+        
+        function formatQuizDate(dateStr) {
+            if (!dateStr) return { text: 'Never taken', freshness: 'old' };
+            
+            const date = new Date(dateStr);
+            // Set current date to Dec 19, 2024 for demo purposes
+            const now = new Date('2024-12-19');
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Format date string
+            const options = { month: 'short', day: 'numeric' };
+            const formattedDate = date.toLocaleDateString('en-US', options);
+            
+            // Determine freshness
+            let freshness = '';
+            let displayText = '';
+            
+            if (diffDays === 0) {
+                freshness = 'fresh';
+                displayText = 'Today';
+            } else if (diffDays === 1) {
+                freshness = 'fresh';
+                displayText = 'Yesterday';
+            } else if (diffDays <= 7) {
+                freshness = 'fresh';
+                displayText = `${diffDays} days ago`;
+            } else if (diffDays <= 30) {
+                freshness = 'recent';
+                displayText = formattedDate;
+            } else if (diffDays <= 90) {
+                freshness = 'stale';
+                displayText = formattedDate;
+            } else {
+                freshness = 'old';
+                displayText = formattedDate;
+            }
+            
+            return { text: displayText, freshness: freshness };
+        }
+        
+        function populatePool(poolType, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            const pool = memberPools[poolType];
+            const selections = selectedMembers[poolType];
+            
+            pool.forEach(member => {
+                const isSelected = selections.includes(member.id);
+                const dateInfo = formatQuizDate(member.quizDate);
+                
+                const memberDiv = document.createElement('div');
+                memberDiv.className = `member-checkbox${isSelected ? ' selected' : ''}`;
+                memberDiv.id = `member-${poolType}-${member.id}`;
+                memberDiv.dataset.name = member.name.toLowerCase();
+                
+                const dualBadge = member.hasDual ? '<span class="dual-badge">BOTH</span>' : '';
+                
+                memberDiv.innerHTML = `
+                    <input type="checkbox" 
+                           id="check-${poolType}-${member.id}" 
+                           ${isSelected ? 'checked' : ''}
+                           onchange="toggleMember('${poolType}', '${member.id}')" />
+                    <div class="member-info">
+                        <div class="member-avatar">${member.initials}</div>
+                        <div class="member-details">
+                            <div class="member-name">${member.name} ${dualBadge}</div>
+                            <div class="member-date ${dateInfo.freshness}">Quiz: ${dateInfo.text}</div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(memberDiv);
+            });
+        }
+        
+        function selectQuizType(type) {
+            // Update current type
+            currentQuizType = type;
+            
+            // Update UI buttons
+            document.querySelectorAll('.quiz-type-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Update pool sections
+            document.getElementById('teamPoolSection').classList.remove('active');
+            document.getElementById('dyadPoolSection').classList.remove('active');
+            
+            if (type === 'team') {
+                document.getElementById('teamQuizBtn').classList.add('active');
+                document.getElementById('teamPoolSection').classList.add('active');
+                document.getElementById('selectionHint').textContent = '(AI will find optimal team of 3-8)';
+            } else {
+                document.getElementById('dyadQuizBtn').classList.add('active');
+                document.getElementById('dyadPoolSection').classList.add('active');
+                document.getElementById('selectionHint').textContent = '(AI will find best matching pair)';
+            }
+            
+            // Update counter
+            updateSelectionCounter();
+            
+            // Validate form
+            validateForm();
+        }
+        
+        function filterMembers(poolType) {
+            const searchInput = document.getElementById(poolType + 'MemberSearch');
+            const searchTerm = searchInput.value.toLowerCase();
+            const containerId = poolType + 'MemberSelection';
+            const container = document.getElementById(containerId);
+            const members = container.querySelectorAll('.member-checkbox');
+            
+            members.forEach(member => {
+                if (member.dataset.name.includes(searchTerm)) {
+                    member.style.display = 'flex';
+                } else {
+                    member.style.display = 'none';
+                }
+            });
+        }
+        
+        function toggleMember(poolType, memberId) {
+            const checkbox = document.getElementById(`check-${poolType}-${memberId}`);
+            const memberDiv = document.getElementById(`member-${poolType}-${memberId}`);
+            
+            if (checkbox.checked) {
+                selectedMembers[poolType].push(memberId);
+                memberDiv.classList.add('selected');
+            } else {
+                selectedMembers[poolType] = selectedMembers[poolType].filter(id => id !== memberId);
+                memberDiv.classList.remove('selected');
+            }
+            
+            // If this is the active pool type, update counter and validate
+            if (poolType === currentQuizType) {
+                updateSelectionCounter();
+                validateForm();
+            }
+        }
+        
+        function updateSelectionCounter() {
+            const count = selectedMembers[currentQuizType].length;
+            document.getElementById('selectedCount').textContent = count;
+        }
+        
+        function validateForm() {
+            const teamName = document.getElementById('teamNameInput').value || currentSuggestedName;
+            const memberCount = selectedMembers[currentQuizType].length;
+            
+            let hasValidMembers = false;
+            if (currentQuizType === 'team') {
+                hasValidMembers = memberCount >= 3;
+            } else {
+                hasValidMembers = memberCount >= 2;
+            }
+            
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = !teamName || !hasValidMembers;
+            
+            // Update button text based on context
+            if (hasValidMembers && teamName) {
+                generateBtn.innerHTML = '<span style="font-size: 18px;">🔬</span> Analyze Team Chemistry';
+            } else {
+                generateBtn.textContent = 'Analyze Team Chemistry';
+            }
+        }
+        
+        function refreshTeamName() {
+            const randomIndex = Math.floor(Math.random() * teamNames.length);
+            currentSuggestedName = teamNames[randomIndex];
+            
+            // Update inline suggestion
+            const inlineSuggestion = document.getElementById('inlineSuggestion');
+            if (inlineSuggestion) {
+                inlineSuggestion.innerHTML = `or use: <strong onclick="useSuggestedName()">${currentSuggestedName}</strong>`;
+            }
+            
+            const input = document.getElementById('teamNameInput');
+            if (!input.value) {
+                input.placeholder = 'Enter team name';
+            }
+        }
+        
+        function useSuggestedName() {
+            const input = document.getElementById('teamNameInput');
+            input.value = currentSuggestedName;
+            validateForm();
+        }
+        
+        function analyzeTeamChemistry() {
+            const teamName = document.getElementById('teamNameInput').value || currentSuggestedName;
+            const currentPool = memberPools[currentQuizType];
+            const totalSelected = selectedMembers[currentQuizType].length;
+            
+            // Hide any previous outputs
+            document.getElementById('commandOutput').style.display = 'none';
+            const instantBtn = document.getElementById('instantResultsBtn');
+            if (instantBtn) instantBtn.remove();
+            
+            // Show processing status
+            const processingDiv = document.getElementById('processingStatus');
+            processingDiv.style.display = 'block';
+            const statusText = document.getElementById('statusText');
+            
+            // Step 1: Analyzing team
+            statusText.textContent = `Analyzing ${totalSelected} selected members...`;
+            
+            setTimeout(() => {
+                // Step 2: Check quiz status
+                statusText.textContent = 'Checking existing assessment data...';
+                
+                setTimeout(() => {
+                    // Filter members needing quiz
+                    const membersNeedingQuiz = selectedMembers[currentQuizType].filter(id => {
+                        const member = currentPool.find(m => m.id === id);
+                        return member && !member.quizDate;
+                    });
+                    
+                    const needQuiz = membersNeedingQuiz.length;
+                    const haveData = totalSelected - needQuiz;
+                    
+                    if (needQuiz === 0) {
+                        // All have data - instant results!
+                        statusText.innerHTML = `<strong>✅ All members have assessments!</strong> Calculating chemistry instantly...`;
+                        
+                        // Start Slack simulation immediately
+                        setTimeout(() => {
+                            processingDiv.style.display = 'none';
+                            const slackWindow = document.getElementById('slackSimulation');
+                            slackWindow.classList.add('active');
+                            
+                            addSlackMessage(`🚀 "${teamName}" - Instant chemistry analysis starting...`);
+                            
+                            // Get all members
+                            const members = selectedMembers[currentQuizType].map(id => 
+                                currentPool.find(m => m.id === id)
+                            );
+                            
+                            // Show member data being loaded
+                            setTimeout(() => {
+                                members.forEach((member, index) => {
+                                    setTimeout(() => {
+                                        const dateInfo = formatQuizDate(member.quizDate);
+                                        addSlackMessage(`✓ ${member.name}: MS score ${member.msScore} (from ${dateInfo.text})`);
+                                    }, 300 * (index + 1));
+                                });
+                                
+                                setTimeout(() => {
+                                    addSlackMessage(`🤖 Running AI optimization...`);
+                                    
+                                    // Find optimal configuration
+                                    let optimal;
+                                    if (currentQuizType === 'dyad') {
+                                        optimal = findOptimalTeam(members, 2, 2);
+                                    } else {
+                                        optimal = findOptimalTeam(members, 3, Math.min(5, members.length));
+                                    }
+                                    
+                                    setTimeout(() => {
+                                        const configType = currentQuizType === 'dyad' ? 'pair' : 'team';
+                                        addSlackMessage(`✨ Optimal ${configType} found: ${optimal.team.length} members`);
+                                        addSlackMessage(`📊 <strong style="color: #10b981;">Chemistry Score: ${optimal.score}%</strong>`);
+                                        addSlackMessage(`Click the chemistry badge to optimize team composition.`);
+                                        
+                                        window.optimalConfiguration = optimal;
+                                        
+                                        setTimeout(() => {
+                                            addNewTeamToList(optimal.score);
+                                            document.getElementById('slackSimulation').classList.remove('active');
+                                        }, 2000);
+                                    }, 1000);
+                                }, 300 * members.length + 500);
+                            }, 500);
+                        }, 1500);
+                        
+                    } else if (haveData > 0) {
+                        // Mixed - some need quiz
+                        statusText.innerHTML = `Found ${haveData} existing assessments. Generating quiz for ${needQuiz} new member${needQuiz > 1 ? 's' : ''}...`;
+                        
+                        setTimeout(() => {
+                            processingDiv.style.display = 'none';
+                            generateQuizCommand(membersNeedingQuiz, haveData, needQuiz);
+                        }, 1500);
+                        
+                    } else {
+                        // All need quiz
+                        statusText.textContent = `No existing assessments found. Generating quiz for all ${needQuiz} members...`;
+                        
+                        setTimeout(() => {
+                            processingDiv.style.display = 'none';
+                            generateQuizCommand(membersNeedingQuiz, 0, needQuiz);
+                        }, 1500);
+                    }
+                }, 1000);
+            }, 500);
+        }
+        
+        function generateQuizCommand(membersNeedingQuiz, haveData, needQuiz) {
+            const teamName = document.getElementById('teamNameInput').value || currentSuggestedName;
+            const currentPool = memberPools[currentQuizType];
+            
+            // Get member handles for those needing quiz
+            const memberHandles = membersNeedingQuiz.map(id => {
+                const member = currentPool.find(m => m.id === id);
+                return `@${member.name.toLowerCase().replace(' ', '.')}`;
+            });
+            
+            const commandType = currentQuizType === 'team' ? 'team-quiz' : 'dyad-quiz';
+            const command = `/${commandType} ${memberHandles.join(' ')}`;
+            
+            document.getElementById('commandText').textContent = command;
+            document.getElementById('commandOutput').style.display = 'block';
+            
+            // Update help text based on scenario
+            let helpMessage = `📋 <strong>Quiz needed for chemistry analysis:</strong> `;
+            if (haveData > 0) {
+                helpMessage += `${haveData} member${haveData > 1 ? 's' : ''} already assessed. `;
+                helpMessage += `${needQuiz} member${needQuiz > 1 ? 's need' : ' needs'} the 2-minute quiz. `;
+            } else {
+                helpMessage += `All ${needQuiz} members need to take the 2-minute quiz. `;
+            }
+            helpMessage += `Copy the command above and paste it in Slack. Results will combine with existing data for optimal team configuration.`;
+            
+            document.querySelector('.help-text').innerHTML = helpMessage;
+            
+            // Slack message
+            let statusMessage = `"${teamName}" - Quiz needed for ${needQuiz} member${needQuiz > 1 ? 's' : ''}`;
+            if (haveData > 0) {
+                statusMessage += ` (${haveData} already assessed)`;
+            }
+            addSlackMessage(statusMessage);
+            
+            document.getElementById('commandOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Keep the original generateCommand function for backward compatibility but redirect to new flow
+        function generateCommand() {
+            analyzeTeamChemistry();
+        }
+        
+        function simulateInstantResults() {
+            const currentPool = memberPools[currentQuizType];
+            const selectedIds = selectedMembers[currentQuizType];
+            const members = selectedIds.map(id => currentPool.find(m => m.id === id));
+            const teamName = document.getElementById('teamNameInput').value || currentSuggestedName;
+            
+            // Highlight Slack window
+            const slackWindow = document.getElementById('slackSimulation');
+            slackWindow.classList.add('active');
+            
+            addSlackMessage(`🚀 Instant chemistry analysis initiated for "${teamName}"`);
+            
+            setTimeout(() => {
+                addSlackMessage(`📊 Loading existing quiz data for ${members.length} members...`);
+                
+                members.forEach((member, index) => {
+                    setTimeout(() => {
+                        const dateInfo = formatQuizDate(member.quizDate);
+                        addSlackMessage(`✓ ${member.name}: Quiz data from ${dateInfo.text} (MS: ${member.msScore})`);
+                    }, 500 * (index + 1));
+                });
+                
+                setTimeout(() => {
+                    addSlackMessage(`🎯 All data loaded! Running AI optimization...`);
+                    
+                    // Find optimal configuration
+                    let optimal;
+                    if (currentQuizType === 'dyad') {
+                        optimal = findOptimalTeam(members, 2, 2);
+                    } else {
+                        optimal = findOptimalTeam(members, 3, Math.min(5, members.length));
+                    }
+                    
+                    setTimeout(() => {
+                        const configType = currentQuizType === 'dyad' ? 'pair' : 'configuration';
+                        addSlackMessage(`🤖 AI found optimal ${configType}: ${optimal.team.length} members`);
+                        addSlackMessage(`📊 <strong style="color: #10b981;">Team Chemistry Score: ${optimal.score}%</strong>`);
+                        addSlackMessage(`✨ Instant results ready! View detailed analysis in the optimizer.`);
+                        
+                        // Store optimal configuration
+                        window.optimalConfiguration = optimal;
+                        
+                        // Add team to list
+                        setTimeout(() => {
+                            addNewTeamToList(optimal.score);
+                        }, 1000);
+                        
+                        // Remove active state
+                        setTimeout(() => {
+                            document.getElementById('slackSimulation').classList.remove('active');
+                        }, 3000);
+                    }, 1500);
+                }, 500 * members.length + 1000);
+            }, 1000);
+        }
+        
+        function copyCommand() {
+            const commandText = document.getElementById('commandText').textContent;
+            
+            // Don't try to copy if it's not a real command
+            if (commandText.startsWith('#')) {
+                return;
+            }
+            
+            navigator.clipboard.writeText(commandText);
+            
+            const copyBtn = document.querySelector('.copy-button');
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            
+            addSlackMessage('Command copied! Paste in Slack to send quiz invitations.');
+            
+            // Auto-continue the demo after a delay
+            setTimeout(() => {
+                simulateSlackPaste(commandText);
+            }, 2000);
+            
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        }
+        
+        function simulateSlackPaste(command) {
+            // Check if it's a no-quiz-needed scenario
+            if (command.startsWith('#')) {
+                // Instant results - no quiz needed
+                simulateInstantResults();
+                return;
+            }
+            
+            // Highlight Slack window
+            const slackWindow = document.getElementById('slackSimulation');
+            slackWindow.classList.add('active');
+            
+            // Show pasting animation
+            addSlackMessage(`<span style="color: #aaa;">Pasting command...</span>`);
+            
+            setTimeout(() => {
+                // Show the pasted command
+                addSlackMessage(`<span style="color: #e1e1e1; font-family: monospace;">${command}</span>`);
+                
+                setTimeout(() => {
+                    // Bot acknowledges
+                    addSlackMessage('✅ Command received! Initiating quiz distribution...');
+                    
+                    // Start sending DMs
+                    setTimeout(() => {
+                        sendQuizInvitations();
+                    }, 1500);
+                }, 1000);
+            }, 1000);
+        }
+        
+        function sendQuizInvitations() {
+            const currentPool = memberPools[currentQuizType];
+            const selectedIds = selectedMembers[currentQuizType];
+            const allMembers = selectedIds.map(id => currentPool.find(m => m.id === id));
+            
+            // Separate members who need quiz from those who have data
+            const membersNeedingQuiz = [];
+            const membersWithData = [];
+            
+            allMembers.forEach(member => {
+                if (!member.quizDate) {
+                    membersNeedingQuiz.push(member);
+                } else {
+                    membersWithData.push(member);
+                }
+            });
+            
+            // Show members with existing data first
+            if (membersWithData.length > 0) {
+                addSlackMessage(`📂 Loading existing quiz data for ${membersWithData.length} member${membersWithData.length > 1 ? 's' : ''}...`);
+                membersWithData.forEach((member, index) => {
+                    setTimeout(() => {
+                        const dateInfo = formatQuizDate(member.quizDate);
+                        addSlackMessage(`✓ ${member.name}: Using quiz from ${dateInfo.text}`);
+                    }, 500 * (index + 1));
+                });
+            }
+            
+            // Send invites to members needing quiz
+            if (membersNeedingQuiz.length > 0) {
+                let inviteIndex = 0;
+                const startDelay = membersWithData.length > 0 ? (membersWithData.length * 500 + 1000) : 0;
+                
+                setTimeout(() => {
+                    addSlackMessage(`📤 Sending quiz invitations to ${membersNeedingQuiz.length} member${membersNeedingQuiz.length > 1 ? 's' : ''}...`);
+                    
+                    function sendNextInvite() {
+                        if (inviteIndex < membersNeedingQuiz.length) {
+                            const member = membersNeedingQuiz[inviteIndex];
+                            addSlackMessage(`📤 Sending quiz to ${member.name} (first assessment)...`);
+                            
+                            inviteIndex++;
+                            
+                            if (inviteIndex < membersNeedingQuiz.length) {
+                                setTimeout(sendNextInvite, 800);
+                            } else {
+                                setTimeout(() => {
+                                    addSlackMessage(`🎯 All ${membersNeedingQuiz.length} quiz invitations sent!`);
+                                    
+                                    // Start showing responses
+                                    setTimeout(() => {
+                                        simulateQuizResponses(allMembers, membersNeedingQuiz, membersWithData);
+                                    }, 1500);
+                                }, 500);
+                            }
+                        }
+                    }
+                    
+                    setTimeout(sendNextInvite, 500);
+                }, startDelay);
+            } else {
+                // All members have data - go straight to results
+                setTimeout(() => {
+                    simulateQuizResponses(allMembers, [], membersWithData);
+                }, membersWithData.length * 500 + 1000);
+            }
+        }
+        
+        function simulateQuizResponses(allMembers, membersNeedingQuiz, membersWithData) {
+            if (membersNeedingQuiz.length === 0) {
+                // All members had data - go straight to optimization
+                addSlackMessage(`✅ All existing quiz data loaded!`);
+                setTimeout(() => {
+                    addSlackMessage(`🎊 Running AI optimization with complete data...`);
+                    
+                    // Find optimal configuration
+                    let optimal;
+                    if (currentQuizType === 'dyad') {
+                        optimal = findOptimalTeam(allMembers, 2, 2);
+                    } else {
+                        optimal = findOptimalTeam(allMembers, 3, Math.min(5, allMembers.length));
+                    }
+                    
+                    setTimeout(() => {
+                        const configType = currentQuizType === 'dyad' ? 'pair' : 'configuration';
+                        addSlackMessage(`🤖 AI found optimal ${configType}: ${optimal.team.length} members`);
+                        addSlackMessage(`📊 <strong style="color: #10b981;">Team Chemistry Score: ${optimal.score}%</strong>`);
+                        addSlackMessage(`View detailed results in the dashboard above.`);
+                        
+                        window.optimalConfiguration = optimal;
+                        
+                        setTimeout(() => {
+                            addNewTeamToList(optimal.score);
+                        }, 1500);
+                        
+                        setTimeout(() => {
+                            document.getElementById('slackSimulation').classList.remove('active');
+                        }, 5000);
+                    }, 1500);
+                }, 1000);
+                return;
+            }
+            
+            // Mixed scenario - some need quiz responses
+            addSlackMessage(`<span style="color: #aaa;">Awaiting quiz responses from ${membersNeedingQuiz.length} member${membersNeedingQuiz.length > 1 ? 's' : ''}...</span>`);
+            
+            let completed = 0;
+            const total = membersNeedingQuiz.length;
+            
+            function showNextResponse() {
+                if (completed < total) {
+                    completed++;
+                    const member = membersNeedingQuiz[completed - 1];
+                    const percentage = Math.round((completed / total) * 100);
+                    
+                    addSlackMessage(`✅ ${member.name} completed quiz (${completed}/${total} - ${percentage}%)`);
+                    
+                    if (completed < total) {
+                        const delay = 1500 + Math.random() * 2000;
+                        setTimeout(showNextResponse, delay);
+                    } else {
+                        // All complete - now combine with existing data
+                        setTimeout(() => {
+                            const totalMembers = allMembers.length;
+                            const withData = membersWithData.length;
+                            addSlackMessage(`🎊 All responses received! ${totalMembers} total members (${withData} existing + ${completed} new)`);
+                            addSlackMessage(`Running AI optimization...`);
+                            
+                            // Find optimal configuration using all members
+                            let optimal;
+                            if (currentQuizType === 'dyad') {
+                                optimal = findOptimalTeam(allMembers, 2, 2);
+                            } else {
+                                optimal = findOptimalTeam(allMembers, 3, Math.min(5, allMembers.length));
+                            }
+                            
+                            setTimeout(() => {
+                                const configType = currentQuizType === 'dyad' ? 'pair' : 'configuration';
+                                addSlackMessage(`🤖 AI found optimal ${configType}: ${optimal.team.length} members`);
+                                addSlackMessage(`📊 <strong style="color: #10b981;">Team Chemistry Score: ${optimal.score}%</strong>`);
+                                addSlackMessage(`View detailed results in the dashboard above.`);
+                                
+                                window.optimalConfiguration = optimal;
+                                
+                                setTimeout(() => {
+                                    addNewTeamToList(optimal.score);
+                                }, 1500);
+                                
+                                setTimeout(() => {
+                                    document.getElementById('slackSimulation').classList.remove('active');
+                                }, 5000);
+                            }, 1500);
+                        }, 1000);
+                    }
+                }
+            }
+            
+            setTimeout(showNextResponse, 2000);
+        }
+        
+        function addNewTeamToList(chemistryScore) {
+            // Get the team name
+            const teamName = document.getElementById('teamNameInput').value || currentSuggestedName;
+            const memberCount = selectedMembers[currentQuizType].length;
+            const isDyadAssessment = currentQuizType === 'dyad';
+            
+            // Store team metadata for optimizer
+            window.currentTeamMetadata = {
+                name: teamName,
+                isDyad: isDyadAssessment,
+                memberCount: memberCount,
+                chemistry: chemistryScore
+            };
+            
+            // Create new team card
+            const newTeamCard = document.createElement('div');
+            newTeamCard.className = 'team-card';
+            newTeamCard.style.opacity = '0';
+            newTeamCard.innerHTML = `
+                <div class="team-info">
+                    <div class="team-name">${teamName}</div>
+                    <div class="team-meta">${memberCount} members • Created just now</div>
+                </div>
+                <div class="team-status">
+                    <div class="progress-indicator">
+                        ${Array(memberCount).fill().map(() => '<div class="progress-dot completed"></div>').join('')}
+                    </div>
+                    <button class="chemistry-badge" onclick="showOptimizer('${teamName}', ${chemistryScore}, ${isDyadAssessment})" style="animation: pulse 2s infinite;">${chemistryScore}% Chemistry</button>
+                </div>
+            `;
+            
+            // Insert at top of existing teams list
+            const existingTeams = document.querySelector('.existing-teams');
+            const firstTeam = existingTeams.querySelector('.team-card');
+            existingTeams.insertBefore(newTeamCard, firstTeam);
+            
+            // Animate in
+            setTimeout(() => {
+                newTeamCard.style.transition = 'all 0.5s ease';
+                newTeamCard.style.opacity = '1';
+                newTeamCard.style.background = '#f0fdf4';
+                
+                // Scroll to show new team
+                newTeamCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Show reset button
+                setTimeout(() => {
+                    showResetButton();
+                    newTeamCard.style.background = '#f9fafb';
+                }, 2000);
+            }, 100);
+        }
+        
+        function showResetButton() {
+            // Check if reset button already exists
+            if (!document.getElementById('resetDemoBtn')) {
+                const resetBtn = document.createElement('button');
+                resetBtn.id = 'resetDemoBtn';
+                resetBtn.className = 'reset-demo-btn';
+                resetBtn.textContent = 'Reset Demo for Another Team';
+                resetBtn.onclick = resetFormAfterSuccess;
+                
+                // Insert after command output
+                const commandOutput = document.getElementById('commandOutput');
+                commandOutput.parentNode.insertBefore(resetBtn, commandOutput.nextSibling);
+            }
+        }
+        
+        function resetFormAfterSuccess() {
+            // Clear selections
+            selectedMembers[currentQuizType] = [];
+            
+            // Clear form
+            document.getElementById('teamNameInput').value = '';
+            document.getElementById('commandOutput').style.display = 'none';
+            
+            // Remove reset button
+            const resetBtn = document.getElementById('resetDemoBtn');
+            if (resetBtn) {
+                resetBtn.remove();
+            }
+            
+            // Clear any deployed badges
+            const deployedBadges = document.querySelectorAll('.deployed-status');
+            deployedBadges.forEach(badge => badge.remove());
+            
+            // Hide Mission Success deployed status
+            const missionStatus = document.getElementById('mission-success-status');
+            if (missionStatus) {
+                missionStatus.style.display = 'none';
+            }
+            
+            // Hide Escape Velocity deployed status
+            const escapeStatus = document.getElementById('escape-velocity-status');
+            if (escapeStatus) {
+                escapeStatus.style.display = 'none';
+            }
+            
+            // Refresh name suggestion
+            refreshTeamName();
+            
+            // Repopulate members to clear checkboxes
+            populateBothPools();
+            
+            // Update counter
+            updateSelectionCounter();
+            
+            // Disable generate button
+            validateForm();
+            
+            // Show success message in Slack
+            addSlackMessage(`✨ Form reset! Ready for next team assessment.`);
+        }
+        
+        function showOptimizer(teamName, score, isDyad = false) {
+            currentTeamName = teamName;
+            
+            // Determine if it's a dyad based on current quiz type or explicit parameter
+            const isActuallyDyad = isDyad || currentQuizType === 'dyad';
+            
+            const optimizerType = isActuallyDyad ? 'Dyad' : 'Team';
+            document.getElementById('optimizerTitle').innerHTML = `${optimizerType} Chemistry Optimizer<br><span style="font-size: 16px; color: #666;">${teamName}</span>`;
+            document.getElementById('mainChemistry').textContent = score + '%';
+            
+            // Store optimizer type and dyad status globally for other functions to use
+            document.getElementById('optimizerView').dataset.isDyad = isActuallyDyad;
+            window.currentOptimizerIsDyad = isActuallyDyad;
+            
+            populateOptimizerMembers(isActuallyDyad, teamName);
+            updateChemistryScores(score, teamName);
+            
+            // Set initial deploy button state 
+            // All teams start as optimal when first opened (AI has selected optimal config)
+            updateDeployButton(true, true);
+            
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('optimizerView').style.display = 'block';
+        }
+        
+        function addSlackMessage(message) {
+            const messagesContainer = document.getElementById('slackMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'slack-message';
+            messageDiv.innerHTML = `
+                <div class="slack-bot-name">Team-Sync Bot</div>
+                ${message}
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Drag and drop functionality
+        let draggedElement = null;
+        
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+        
+        function drag(ev) {
+            draggedElement = ev.target;
+            ev.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            
+            if (draggedElement && ev.currentTarget.classList.contains('zone')) {
+                let targetContainer;
+                if (ev.currentTarget.id === 'currentTeam') {
+                    targetContainer = document.getElementById('optimizedMembers');
+                } else if (ev.currentTarget.id === 'availablePool') {
+                    targetContainer = document.getElementById('poolMembers');
+                }
+                
+                if (targetContainer) {
+                    // Remove any guidance messages before adding member
+                    const guidanceMsg = targetContainer.querySelector('.zone-guidance');
+                    if (guidanceMsg) {
+                        guidanceMsg.remove();
+                    }
+                    
+                    targetContainer.appendChild(draggedElement);
+                    updateOptimizedScore();
+                }
+            }
+        }
+        
+        function createMemberElement(id, initials, name) {
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'team-member';
+            memberDiv.draggable = true;
+            memberDiv.id = id;
+            memberDiv.ondragstart = drag;
+            memberDiv.innerHTML = `
+                <div class="member-avatar">${initials}</div>
+                <span>${name}</span>
+            `;
+            return memberDiv;
+        }
+        
+        function toggleSubscales() {
+            const subscalesSection = document.getElementById('subscalesSection');
+            subscalesSection.classList.toggle('collapsed');
+        }
+        
+        function showDashboard() {
+            // Reset override section when returning to dashboard
+            const overrideCheckbox = document.getElementById('overrideCheckbox');
+            const deployBtn = document.getElementById('deployBtn');
+            if (overrideCheckbox) {
+                overrideCheckbox.checked = false;
+            }
+            if (deployBtn) {
+                deployBtn.textContent = 'Deploy Optimized Team';
+            }
+            
+            document.getElementById('optimizerView').style.display = 'none';
+            document.getElementById('dashboardView').style.display = 'block';
+        }
+        
+        function populateOptimizerMembers(isDyad = false, teamName = '') {
+            const optimizedContainer = document.getElementById('optimizedMembers');
+            const poolContainer = document.getElementById('poolMembers');
+            
+            optimizedContainer.innerHTML = '';
+            poolContainer.innerHTML = '';
+            
+            // Special handling for pre-existing demo teams
+            if (teamName === 'Mission Success') {
+                // Predefined optimal team for Mission Success (89% chemistry)
+                const missionSuccessTeam = [
+                    memberPools.team[0], // Sarah Johnson - MS: 72
+                    memberPools.team[2], // Emily Parker - MS: 78
+                    memberPools.team[4], // Jessica Rodriguez - MS: 74
+                    memberPools.team[7], // Alex Thompson - MS: 76
+                    memberPools.team[1]  // Michael Chen - MS: 68
+                ];
+                
+                // Store as optimal configuration for comparison
+                window.currentOptimalTeam = missionSuccessTeam.map(m => m.id);
+                
+                // Populate optimized team
+                missionSuccessTeam.forEach(member => {
+                    const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                    optimizedContainer.appendChild(memberEl);
+                });
+                
+                // Add David Wilson to the pool as an alternative
+                const memberEl = createMemberElement(`opt-${memberPools.team[3].id}`, 
+                    memberPools.team[3].initials, memberPools.team[3].name);
+                poolContainer.appendChild(memberEl);
+                
+                return;
+            }
+            
+            // Special handling for Escape Velocity dyad
+            if (teamName === 'Escape Velocity') {
+                // Predefined dyad for Escape Velocity (82% chemistry)
+                const escapeVelocityDyad = [
+                    memberPools.dyad[0], // Alex Thompson - MS: 76
+                    memberPools.dyad[1]  // Rachel Smith - MS: 71
+                ];
+                
+                // Store as optimal configuration for comparison
+                window.currentOptimalTeam = escapeVelocityDyad.map(m => m.id);
+                
+                // Populate optimized dyad
+                escapeVelocityDyad.forEach(member => {
+                    const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                    optimizedContainer.appendChild(memberEl);
+                });
+                
+                // Add Daniel Martinez to the pool as an alternative
+                const memberEl = createMemberElement(`opt-${memberPools.dyad[2].id}`, 
+                    memberPools.dyad[2].initials, memberPools.dyad[2].name);
+                poolContainer.appendChild(memberEl);
+                
+                return;
+            }
+            
+            // Get the actual optimal configuration if it exists (for newly created teams)
+            if (window.optimalConfiguration && window.optimalConfiguration.team) {
+                // Use the AI-optimized configuration
+                const optimal = window.optimalConfiguration;
+                const pool = memberPools[currentQuizType];
+                const selectedIds = selectedMembers[currentQuizType];
+                const allSelectedMembers = selectedIds.map(id => pool.find(m => m.id === id));
+                
+                // For dyads, ensure we only put 2 members in the optimized zone
+                if (isDyad) {
+                    // Take the first 2 members from the optimal team
+                    const dyadMembers = optimal.team.slice(0, 2);
+                    
+                    // Store as optimal configuration for comparison
+                    window.currentOptimalTeam = dyadMembers.map(m => m.id);
+                    
+                    dyadMembers.forEach(member => {
+                        const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                        optimizedContainer.appendChild(memberEl);
+                    });
+                    
+                    // Put remaining members in the pool
+                    allSelectedMembers.forEach(member => {
+                        if (!dyadMembers.find(m => m.id === member.id)) {
+                            const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                            poolContainer.appendChild(memberEl);
+                        }
+                    });
+                } else {
+                    // Store as optimal configuration for comparison
+                    window.currentOptimalTeam = optimal.team.map(m => m.id);
+                    
+                    // Regular team handling
+                    optimal.team.forEach(member => {
+                        const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                        optimizedContainer.appendChild(memberEl);
+                    });
+                    
+                    // Put remaining members in the pool
+                    allSelectedMembers.forEach(member => {
+                        if (!optimal.team.find(m => m.id === member.id)) {
+                            const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                            poolContainer.appendChild(memberEl);
+                        }
+                    });
+                }
+                
+                // Clear the stored configuration after use
+                window.optimalConfiguration = null;
+            } else {
+                // Fallback for existing teams without optimization data
+                const pool = memberPools[currentQuizType];
+                const selectedIds = selectedMembers[currentQuizType];
+                const selectedMembersList = selectedIds.map(id => pool.find(m => m.id === id));
+                
+                // For dyads, limit to 2 members in optimized zone
+                if (isDyad) {
+                    const dyadMembers = selectedMembersList.slice(0, 2);
+                    // Store as optimal configuration for comparison (fallback)
+                    window.currentOptimalTeam = dyadMembers.map(m => m.id);
+                    
+                    selectedMembersList.forEach((member, index) => {
+                        if (index < 2) {
+                            const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                            optimizedContainer.appendChild(memberEl);
+                        } else {
+                            const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                            poolContainer.appendChild(memberEl);
+                        }
+                    });
+                } else {
+                    // Regular team: show first 3 as a default
+                    const teamMembers = selectedMembersList.slice(0, 3);
+                    // Store as optimal configuration for comparison (fallback)
+                    window.currentOptimalTeam = teamMembers.map(m => m.id);
+                    
+                    selectedMembersList.forEach((member, index) => {
+                        if (index < 3) {
+                            const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                            optimizedContainer.appendChild(memberEl);
+                        } else {
+                            const memberEl = createMemberElement(`opt-${member.id}`, member.initials, member.name);
+                            poolContainer.appendChild(memberEl);
+                        }
+                    });
+                }
+            }
+        }
+        
+        // Show status messages in the optimizer
+        function showOptimizerStatus(message) {
+            const statusDiv = document.getElementById('optimizerStatus');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.classList.add('show');
+                
+                // Auto-hide after 4 seconds
+                setTimeout(() => {
+                    statusDiv.classList.remove('show');
+                }, 4000);
+            }
+        }
+        
+        // Track if current configuration is optimal
+        let isOptimalConfiguration = true;
+        
+        function toggleOverride() {
+            const checkbox = document.getElementById('overrideCheckbox');
+            const deployBtn = document.getElementById('deployBtn');
+            
+            if (checkbox.checked) {
+                deployBtn.disabled = false;
+                deployBtn.textContent = 'Deploy Alternative Team';
+            } else {
+                deployBtn.disabled = true;
+                deployBtn.textContent = 'Deploy Optimized Team';
+            }
+        }
+        
+        function updateDeployButton(isOptimal, isValidConfig) {
+            const deployBtn = document.getElementById('deployBtn');
+            const overrideSection = document.getElementById('overrideSection');
+            const overrideCheckbox = document.getElementById('overrideCheckbox');
+            
+            if (!isValidConfig) {
+                // Invalid configuration - hide everything
+                deployBtn.disabled = true;
+                deployBtn.textContent = 'Deploy Optimized Team';
+                overrideSection.style.display = 'none';
+                overrideCheckbox.checked = false;
+            } else if (isOptimal) {
+                // Optimal configuration - enable deploy button
+                deployBtn.disabled = false;
+                deployBtn.textContent = 'Deploy Optimized Team';
+                overrideSection.style.display = 'none';
+                overrideCheckbox.checked = false;
+            } else {
+                // Valid but not optimal - show override option
+                deployBtn.disabled = true;
+                deployBtn.textContent = 'Deploy Optimized Team';
+                overrideSection.style.display = 'block';
+                overrideCheckbox.checked = false;
+            }
+        }
+        
+        function updateOptimizedScore() {
+            const optimizedContainer = document.getElementById('optimizedMembers');
+            const memberElements = optimizedContainer.querySelectorAll('.team-member');
+            
+            // Remove any existing guidance messages
+            const existingGuidance = optimizedContainer.querySelector('.zone-guidance');
+            if (existingGuidance) {
+                existingGuidance.remove();
+            }
+            
+            // Determine if we're in dyad mode or team mode
+            const isDyadMode = window.currentOptimizerIsDyad || 
+                              (currentTeamName === 'Escape Velocity') || 
+                              (document.getElementById('optimizerTitle').textContent.includes('Dyad'));
+            
+            const memberCount = memberElements.length;
+            let isValidConfig = false;
+            let isOptimal = false;
+            
+            // Validation logic for both dyad and team modes
+            if (isDyadMode) {
+                // Dyad validation: must have exactly 2 members
+                if (memberCount !== 2) {
+                    document.getElementById('mainChemistry').textContent = 'N/A';
+                    document.getElementById('autoScore').textContent = 'N/A';
+                    document.getElementById('trustScore').textContent = 'N/A';
+                    document.getElementById('easeScore').textContent = 'N/A';
+                    document.getElementById('integrationScore').textContent = 'N/A';
+                    
+                    const guidanceDiv = document.createElement('div');
+                    guidanceDiv.className = 'zone-guidance';
+                    
+                    if (memberCount === 0) {
+                        guidanceDiv.textContent = 'No members in dyad. Add exactly 2 members for chemistry calculation.';
+                    } else if (memberCount === 1) {
+                        guidanceDiv.textContent = 'Only 1 member. Add exactly 1 more for dyad chemistry calculation.';
+                    } else {
+                        guidanceDiv.textContent = `Too many members (${memberCount}). A dyad requires exactly 2 members.`;
+                    }
+                    
+                    optimizedContainer.appendChild(guidanceDiv);
+                    updateDeployButton(false, false);
+                    return;
+                }
+                isValidConfig = true;
+            } else {
+                // Team validation: must have 3-8 members
+                if (memberCount < 3 || memberCount > 8) {
+                    document.getElementById('mainChemistry').textContent = 'N/A';
+                    document.getElementById('autoScore').textContent = 'N/A';
+                    document.getElementById('trustScore').textContent = 'N/A';
+                    document.getElementById('easeScore').textContent = 'N/A';
+                    document.getElementById('integrationScore').textContent = 'N/A';
+                    
+                    const guidanceDiv = document.createElement('div');
+                    guidanceDiv.className = 'zone-guidance';
+                    
+                    if (memberCount === 0) {
+                        guidanceDiv.textContent = 'No members in team. Add 3-8 members for chemistry calculation.';
+                    } else if (memberCount === 1) {
+                        guidanceDiv.textContent = 'Only 1 member. Add at least 2 more for team chemistry calculation.';
+                    } else if (memberCount === 2) {
+                        guidanceDiv.textContent = 'Only 2 members. Add at least 1 more for team chemistry calculation.';
+                    } else {
+                        guidanceDiv.textContent = `Too many members (${memberCount}). Teams should have 3-8 members for optimal performance.`;
+                    }
+                    
+                    optimizedContainer.appendChild(guidanceDiv);
+                    updateDeployButton(false, false);
+                    return;
+                }
+                isValidConfig = true;
+            }
+            
+            // Determine which pool to use based on current context
+            let pool;
+            if (currentTeamName === 'Escape Velocity') {
+                pool = memberPools.dyad;
+            } else if (currentTeamName === 'Mission Success') {
+                pool = memberPools.team;
+            } else {
+                pool = memberPools[currentQuizType];
+            }
+            
+            // Get actual member objects for chemistry calculation
+            const optimizedMembers = [];
+            let currentMemberIds = [];
+            
+            memberElements.forEach(el => {
+                const memberId = el.id.replace('opt-', '');
+                currentMemberIds.push(memberId);
+                
+                // Try to find member in the determined pool
+                let member = pool.find(m => m.id === memberId);
+                
+                // If not found, check both pools (for members with dual badges)
+                if (!member) {
+                    member = memberPools.team.find(m => m.id === memberId) || 
+                             memberPools.dyad.find(m => m.id === memberId);
+                }
+                
+                if (member) {
+                    optimizedMembers.push(member);
+                }
+            });
+            
+            // Check if current configuration matches optimal configuration
+            isOptimal = false;
+            if (window.currentOptimalTeam && currentMemberIds.length === window.currentOptimalTeam.length) {
+                isOptimal = currentMemberIds.every(id => window.currentOptimalTeam.includes(id));
+            }
+            
+            // Special handling for known configurations
+            if (currentTeamName === 'Escape Velocity' && optimizedMembers.length === 2) {
+                // Check if it's the original optimized pair
+                const hasAlex = optimizedMembers.some(m => m.name === 'Alex Thompson');
+                const hasRachel = optimizedMembers.some(m => m.name === 'Rachel Smith');
+                
+                if (hasAlex && hasRachel) {
+                    // Original optimized pair - show 82%
+                    document.getElementById('mainChemistry').textContent = '82%';
+                    document.getElementById('autoScore').textContent = '85%';
+                    document.getElementById('trustScore').textContent = '83%';
+                    document.getElementById('easeScore').textContent = '79%';
+                    document.getElementById('integrationScore').textContent = '81%';
+                    isOptimal = true;
+                    updateDeployButton(true, true);
+                    showOptimizerStatus('Optimal dyad configuration.');
+                    return;
+                } else {
+                    // Alternative configuration - show lower score
+                    const newScore = calculateTeamChemistry(optimizedMembers);
+                    document.getElementById('mainChemistry').textContent = newScore + '%';
+                    
+                    // Update subscales
+                    const avgUnderstanding = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.understanding, 0) / optimizedMembers.length);
+                    const avgTrust = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.trust, 0) / optimizedMembers.length);
+                    const avgEase = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.ease, 0) / optimizedMembers.length);
+                    const avgIntegration = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.integration, 0) / optimizedMembers.length);
+                    
+                    document.getElementById('autoScore').textContent = avgUnderstanding + '%';
+                    document.getElementById('trustScore').textContent = avgTrust + '%';
+                    document.getElementById('easeScore').textContent = avgEase + '%';
+                    document.getElementById('integrationScore').textContent = avgIntegration + '%';
+                    
+                    isOptimal = false;
+                    updateDeployButton(false, true);
+                    showOptimizerStatus('Alternative configuration. AI recommends different pairing for optimal chemistry.');
+                    return;
+                }
+            }
+            
+            // Special handling for Mission Success
+            if (currentTeamName === 'Mission Success' && isValidConfig) {
+                // Mission Success optimal configuration is 5 specific members
+                const expectedMembers = ['Sarah Johnson', 'Emily Parker', 'Jessica Rodriguez', 'Alex Thompson', 'Michael Chen'];
+                const hasAllOptimalMembers = expectedMembers.every(name => 
+                    optimizedMembers.some(m => m.name === name)
+                ) && optimizedMembers.length === 5;
+                
+                if (hasAllOptimalMembers) {
+                    document.getElementById('mainChemistry').textContent = '89%';
+                    document.getElementById('autoScore').textContent = '87%';
+                    document.getElementById('trustScore').textContent = '91%';
+                    document.getElementById('easeScore').textContent = '88%';
+                    document.getElementById('integrationScore').textContent = '90%';
+                    updateDeployButton(true, true);
+                    showOptimizerStatus('Optimal team configuration.');
+                } else {
+                    // Calculate chemistry for alternative configuration
+                    const newScore = calculateTeamChemistry(optimizedMembers);
+                    document.getElementById('mainChemistry').textContent = newScore + '%';
+                    
+                    if (optimizedMembers.length > 0) {
+                        const avgUnderstanding = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.understanding, 0) / optimizedMembers.length);
+                        const avgTrust = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.trust, 0) / optimizedMembers.length);
+                        const avgEase = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.ease, 0) / optimizedMembers.length);
+                        const avgIntegration = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.integration, 0) / optimizedMembers.length);
+                        
+                        document.getElementById('autoScore').textContent = avgUnderstanding + '%';
+                        document.getElementById('trustScore').textContent = avgTrust + '%';
+                        document.getElementById('easeScore').textContent = avgEase + '%';
+                        document.getElementById('integrationScore').textContent = avgIntegration + '%';
+                    }
+                    updateDeployButton(false, true);
+                    showOptimizerStatus('Alternative configuration. AI recommends optimal team for best chemistry.');
+                }
+                
+                return;
+            }
+            
+            // Calculate actual chemistry for other configurations
+            const newScore = calculateTeamChemistry(optimizedMembers);
+            document.getElementById('mainChemistry').textContent = newScore + '%';
+            
+            // Update subscales based on actual members
+            if (optimizedMembers.length > 0) {
+                const avgUnderstanding = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.understanding, 0) / optimizedMembers.length);
+                const avgTrust = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.trust, 0) / optimizedMembers.length);
+                const avgEase = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.ease, 0) / optimizedMembers.length);
+                const avgIntegration = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.integration, 0) / optimizedMembers.length);
+                
+                document.getElementById('autoScore').textContent = avgUnderstanding + '%';
+                document.getElementById('trustScore').textContent = avgTrust + '%';
+                document.getElementById('easeScore').textContent = avgEase + '%';
+                document.getElementById('integrationScore').textContent = avgIntegration + '%';
+            }
+            
+            // Update deploy button based on whether configuration is optimal
+            updateDeployButton(isOptimal, isValidConfig);
+            
+            // Show feedback for configuration changes
+            if (!isOptimal && isValidConfig) {
+                if (isDyadMode) {
+                    showOptimizerStatus('Alternative configuration. AI recommends different pairing for optimal chemistry.');
+                } else {
+                    showOptimizerStatus('Alternative configuration. AI recommends different members for optimal chemistry.');
+                }
+            } else if (isOptimal && isValidConfig) {
+                if (isDyadMode && memberCount === 2) {
+                    showOptimizerStatus('Optimal dyad configuration.');
+                } else if (!isDyadMode && memberCount === 4) {
+                    showOptimizerStatus('Optimal team size achieved (4 members).');
+                } else if (!isDyadMode && memberCount === 8) {
+                    showOptimizerStatus('Maximum team size reached (8 members).');
+                }
+            }
+        }
+        
+        function updateChemistryScores(score, teamName = '') {
+            // Special handling for Mission Success demo team
+            if (teamName === 'Mission Success' || currentTeamName === 'Mission Success') {
+                const missionSuccessSubscales = {
+                    understanding: 87,
+                    trust: 91, 
+                    ease: 88,
+                    integration: 90
+                };
+                
+                document.getElementById('autoScore').textContent = missionSuccessSubscales.understanding + '%';
+                document.getElementById('trustScore').textContent = missionSuccessSubscales.trust + '%';
+                document.getElementById('easeScore').textContent = missionSuccessSubscales.ease + '%';
+                document.getElementById('integrationScore').textContent = missionSuccessSubscales.integration + '%';
+                return;
+            }
+            
+            // Special handling for Escape Velocity dyad
+            if (teamName === 'Escape Velocity' || currentTeamName === 'Escape Velocity') {
+                const escapeVelocitySubscales = {
+                    understanding: 85,
+                    trust: 83,
+                    ease: 79,
+                    integration: 81
+                };
+                
+                document.getElementById('autoScore').textContent = escapeVelocitySubscales.understanding + '%';
+                document.getElementById('trustScore').textContent = escapeVelocitySubscales.trust + '%';
+                document.getElementById('easeScore').textContent = escapeVelocitySubscales.ease + '%';
+                document.getElementById('integrationScore').textContent = escapeVelocitySubscales.integration + '%';
+                return;
+            }
+            
+            // For the optimizer view, recalculate subscales based on current team
+            const optimizedContainer = document.getElementById('optimizedMembers');
+            const memberElements = optimizedContainer.querySelectorAll('.team-member');
+            
+            if (memberElements.length > 0) {
+                const pool = memberPools[currentQuizType];
+                const optimizedMembers = [];
+                
+                memberElements.forEach(el => {
+                    const memberId = el.id.replace('opt-', '');
+                    const member = pool.find(m => m.id === memberId);
+                    if (member) {
+                        optimizedMembers.push(member);
+                    }
+                });
+                
+                // Calculate average subscales for the current team
+                if (optimizedMembers.length > 0) {
+                    const avgUnderstanding = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.understanding, 0) / optimizedMembers.length);
+                    const avgTrust = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.trust, 0) / optimizedMembers.length);
+                    const avgEase = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.ease, 0) / optimizedMembers.length);
+                    const avgIntegration = Math.round(optimizedMembers.reduce((sum, m) => sum + m.subscales.integration, 0) / optimizedMembers.length);
+                    
+                    document.getElementById('autoScore').textContent = avgUnderstanding + '%';
+                    document.getElementById('trustScore').textContent = avgTrust + '%';
+                    document.getElementById('easeScore').textContent = avgEase + '%';
+                    document.getElementById('integrationScore').textContent = avgIntegration + '%';
+                } else {
+                    // Fallback if no members found
+                    document.getElementById('autoScore').textContent = Math.round(score * 0.95) + '%';
+                    document.getElementById('trustScore').textContent = Math.round(score * 1.05) + '%';
+                    document.getElementById('easeScore').textContent = Math.round(score * 0.98) + '%';
+                    document.getElementById('integrationScore').textContent = Math.round(score * 1.02) + '%';
+                }
+            } else {
+                // Initial display before members are loaded
+                document.getElementById('autoScore').textContent = Math.round(score * 0.95) + '%';
+                document.getElementById('trustScore').textContent = Math.round(score * 1.05) + '%';
+                document.getElementById('easeScore').textContent = Math.round(score * 0.98) + '%';
+                document.getElementById('integrationScore').textContent = Math.round(score * 1.02) + '%';
+            }
+        }
+        
+        function deployTeam() {
+            const isAlternative = document.getElementById('overrideCheckbox').checked;
+            const teamType = isAlternative ? 'alternative team configuration' : 'optimized team';
+            const currentScore = document.getElementById('mainChemistry').textContent;
+            
+            // Show deployment status in the optimizer
+            showOptimizerStatus(`Deploying ${teamType}...`);
+            
+            setTimeout(() => {
+                addSlackMessage('✅ Team channel created');
+                setTimeout(() => {
+                    addSlackMessage('✅ Members notified');
+                    
+                    // Update the chemistry score on the dashboard if it's an alternative configuration
+                    if (isAlternative) {
+                        const teamCards = document.querySelectorAll('.team-card');
+                        teamCards.forEach(card => {
+                            const teamNameEl = card.querySelector('.team-name');
+                            if (teamNameEl) {
+                                const teamNameText = teamNameEl.textContent.replace('DEPLOYED', '').trim();
+                                if (teamNameText === currentTeamName) {
+                                    // Update the chemistry button with the actual deployed score
+                                    const chemButton = card.querySelector('.chemistry-badge');
+                                    if (chemButton) {
+                                        chemButton.textContent = currentScore + ' Chemistry';
+                                        // Update onclick to reflect new score
+                                        const scoreNum = currentScore.replace('%', '');
+                                        const isDyad = currentTeamName === 'Escape Velocity';
+                                        chemButton.setAttribute('onclick', `showOptimizer('${currentTeamName}', ${scoreNum}, ${isDyad})`);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Special handling for pre-existing demo teams
+                    if (currentTeamName === 'Mission Success') {
+                        const missionStatus = document.getElementById('mission-success-status');
+                        if (missionStatus) {
+                            missionStatus.style.display = 'inline';
+                        }
+                    } else if (currentTeamName === 'Escape Velocity') {
+                        const escapeStatus = document.getElementById('escape-velocity-status');
+                        if (escapeStatus) {
+                            escapeStatus.style.display = 'inline';
+                        }
+                    } else {
+                        // For other teams, add deployed badge
+                        const teamCards = document.querySelectorAll('.team-card');
+                        teamCards.forEach(card => {
+                            const teamNameEl = card.querySelector('.team-name');
+                            if (teamNameEl) {
+                                const teamNameText = teamNameEl.textContent.replace('DEPLOYED', '').trim();
+                                if (teamNameText === currentTeamName) {
+                                    // Check if deployed badge already exists
+                                    let statusBadge = card.querySelector('.deployed-status');
+                                    if (!statusBadge) {
+                                        statusBadge = document.createElement('span');
+                                        statusBadge.className = 'deployed-status';
+                                        statusBadge.style.cssText = 'background: #10b981; color: white; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-left: 10px; font-weight: 600;';
+                                        statusBadge.textContent = 'DEPLOYED';
+                                        teamNameEl.appendChild(statusBadge);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    const successMessage = isAlternative ? 
+                        `✅ Alternative configuration for "${currentTeamName}" deployed with ${currentScore} chemistry!` :
+                        `✅ Team "${currentTeamName}" deployed!`;
+                    
+                    alert(successMessage);
+                    showDashboard();
+                }, 500);
+            }, 500);
+        }
+        
+        function toggleSlack() {
+            const slackWindow = document.getElementById('slackSimulation');
+            const messages = slackWindow.querySelector('.slack-messages');
+            if (messages.style.display === 'none') {
+                messages.style.display = 'block';
+            } else {
+                messages.style.display = 'none';
+            }
+        }
+        
+        // Remove drag-over on leave
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.zone').forEach(zone => {
+                zone.addEventListener('dragleave', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('drag-over');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
