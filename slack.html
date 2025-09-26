@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voltaic Motors - Slack</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif;
+            background: #1a1d21;
+            color: #d1d2d3;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .slack-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Far Left Icon Rail */
+        .icon-rail {
+            width: 70px;
+            background: #3f0e40;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            border-right: 1px solid #522653;
+        }
+        
+        .workspace-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #611f69, #8b3f93);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 900;
+            font-size: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .workspace-icon.active::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 36px;
+            background: #fff;
+            border-radius: 0 2px 2px 0;
+        }
+        
+        .rail-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 20px;
+            margin: 4px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .rail-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .rail-icon.active {
+            background: #1164a3;
+            color: #fff;
+        }
+        
+        .rail-separator {
+            width: 32px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
+        }
+        
+        .add-workspace {
+            width: 36px;
+            height: 36px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 24px;
+            margin-top: auto;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .add-workspace:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .user-avatar-rail {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .online-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            background: #2bac76;
+            border: 3px solid #3f0e40;
+            border-radius: 50%;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #3f0e40;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #522653;
+        }
+        
+        .workspace-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #522653;
+            background: #3f0e40;
+        }
+        
+        .workspace-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .workspace-name:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        
+        .workspace-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+        }
+        
+        .workspace-dropdown {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+        }
+        
+        .compose-btn {
+            margin: 12px;
+            padding: 9px;
+            background: #fff;
+            color: #3f0e40;
+            border: none;
+            border-radius: 24px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .compose-btn:hover {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Channels List */
+        .channels-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        
+        .channels-section::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .channels-section::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .channels-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .section-header {
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .section-header:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        
+        .section-title {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .caret {
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .caret.collapsed {
+            transform: rotate(-90deg);
+        }
+        
+        .channel-item {
+            padding: 4px 16px 4px 28px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.1s;
+        }
+        
+        .channel-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+        }
+        
+        .channel-item.active {
+            background: rgba(255, 255, 255, 0.13);
+            color: #fff;
+        }
+        
+        .channel-icon {
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .channel-name {
+            flex: 1;
+            font-size: 15px;
+        }
+        
+        .unread-count {
+            background: #cd2553;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 18px;
+            text-align: center;
+        }
+        
+        .dm-status {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .dm-status.online {
+            background: #2bac76;
+        }
+        
+        .dm-status.offline {
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+        
+        .add-channel {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+        }
+        
+        .channel-header {
+            height: 49px;
+            border-bottom: 1px solid #e2e2e2;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+        }
+        
+        .channel-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .channel-header-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #1d1c1d;
+        }
+        
+        .channel-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-icons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .header-icon {
+            color: rgba(29, 28, 29, 0.7);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .header-icon:hover {
+            color: #1d1c1d;
+        }
+        
+        /* Messages Area */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #ffffff;
+        }
+        
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb {
+            background: rgba(29, 28, 29, 0.3);
+            border-radius: 4px;
+        }
+        
+        .channel-intro {
+            padding: 32px 0;
+            border-bottom: 1px solid #e2e2e2;
+            margin-bottom: 24px;
+        }
+        
+        .channel-intro h1 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #1d1c1d;
+            margin-bottom: 8px;
+        }
+        
+        .channel-intro p {
+            color: #616061;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .edit-desc {
+            color: #1890ff;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .edit-desc:hover {
+            text-decoration: underline;
+        }
+        
+        .add-people-btn {
+            margin-top: 16px;
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid #616061;
+            color: #1d1c1d;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .add-people-btn:hover {
+            background: #f8f8f8;
+            border-color: #1d1c1d;
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: background 0.1s;
+        }
+        
+        .message:hover {
+            background: #f8f8f8;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .message-author {
+            font-weight: 900;
+            color: #1d1c1d;
+            font-size: 15px;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: #616061;
+        }
+        
+        .message-text {
+            color: #1d1c1d;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .system-message {
+            text-align: center;
+            padding: 12px;
+            margin: 20px 0;
+        }
+        
+        .system-message-content {
+            display: inline-block;
+            background: transparent;
+            padding: 8px 16px;
+            border: 1px solid #e2e2e2;
+            border-radius: 20px;
+            color: #616061;
+            font-size: 14px;
+        }
+        
+        /* Message Input */
+        .message-input-container {
+            border-top: 1px solid #e2e2e2;
+            padding: 10px 20px 24px;
+            background: #ffffff;
+        }
+        
+        .message-input-wrapper {
+            background: #ffffff;
+            border: 1px solid #868686;
+            border-radius: 8px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-toolbar {
+            display: flex;
+            align-items: center;
+            padding: 8px 8px 0 8px;
+            gap: 2px;
+            background: #f8f8f8;
+            border-bottom: 1px solid #e2e2e2;
+        }
+        
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: #e2e2e2;
+            margin: 0 4px;
+        }
+        
+        .toolbar-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #616061;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: all 0.1s;
+            background: transparent;
+            border: none;
+        }
+        
+        .toolbar-btn:hover {
+            background: #e8e8e8;
+            color: #1d1c1d;
+        }
+        
+        .message-input {
+            background: transparent;
+            border: none;
+            padding: 8px 12px;
+            color: #1d1c1d;
+            font-size: 15px;
+            resize: none;
+            width: 100%;
+            outline: none;
+            min-height: 44px;
+        }
+        
+        .message-input::placeholder {
+            color: #616061;
+        }
+        
+        .input-bottom-toolbar {
+            display: flex;
+            align-items: center;
+            padding: 0 8px 8px;
+            gap: 2px;
+        }
+        
+        .send-options {
+            margin-left: auto;
+            display: flex;
+            gap: 4px;
+        }
+        
+        /* Apps Section (hidden by default) */
+        .apps-overlay {
+            position: fixed;
+            top: 0;
+            left: 70px;
+            right: 0;
+            bottom: 0;
+            background: #1a1d21;
+            display: none;
+            z-index: 500;
+        }
+        
+        .apps-overlay.active {
+            display: flex;
+        }
+        
+        .apps-sidebar {
+            width: 260px;
+            background: #2d2f33;
+            border-right: 1px solid rgba(255, 255, 255, 0.13);
+            padding: 20px 0;
+        }
+        
+        .apps-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            background: #1a1d21;
+        }
+        
+        .apps-header {
+            margin-bottom: 32px;
+        }
+        
+        .apps-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        
+        .apps-subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+        }
+        
+        .apps-search {
+            margin-bottom: 32px;
+        }
+        
+        .apps-search-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 16px;
+            background: #40464b;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .app-card {
+            background: #2d2f33;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .app-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .app-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .app-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 900;
+            font-size: 20px;
+        }
+        
+        .app-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .app-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        
+        .app-install-btn {
+            background: #007a5a;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .app-install-btn:hover {
+            background: #148567;
+        }
+        
+        /* Installation Modal */
+        .install-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .install-modal.active {
+            display: flex;
+        }
+        
+        .install-dialog {
+            background: #fff;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            padding: 32px;
+            color: #1d1c1d;
+        }
+        
+        .install-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .install-app-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 900;
+            font-size: 24px;
+        }
+        
+        .install-app-info h2 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .install-app-info p {
+            color: #616061;
+            font-size: 14px;
+        }
+        
+        .permissions-section {
+            margin-bottom: 24px;
+        }
+        
+        .permissions-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .permission-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #616061;
+            font-size: 14px;
+        }
+        
+        .permission-icon {
+            color: #007a5a;
+            margin-top: 2px;
+        }
+        
+        .install-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .install-cancel {
+            background: #f8f8f8;
+            color: #1d1c1d;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .install-confirm {
+            background: #007a5a;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .install-confirm:hover {
+            background: #148567;
+        }
+        
+        .apps-menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .apps-menu-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+        }
+        
+        .apps-menu-item.active {
+            background: #1164A3;
+            color: #fff;
+        }
+        
+        .close-apps {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .close-apps:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+        }
+        
+        /* Bot message styling */
+        .bot-label {
+            background: #e8e8e8;
+            color: #616061;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        
+        .message-link {
+            color: #1264a3;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .message-link:hover {
+            text-decoration: underline;
+        }
+        
+        .add-reaction {
+            display: inline-block;
+            margin-top: 8px;
+        }
+        
+        .reaction {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f8f8f8;
+            border: 1px solid #e2e2e2;
+            padding: 2px 8px;
+            border-radius: 16px;
+            font-size: 14px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        
+        .reaction:hover {
+            border-color: #1264a3;
+            background: #e8f5fa;
+        }
+        
+        .reaction-emoji {
+            font-size: 16px;
+        }
+        
+        .reaction-count {
+            color: #616061;
+            font-size: 12px;
+        }
+        
+        .thread-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 4px 0;
+            color: #1264a3;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .thread-info:hover {
+            color: #0b4c8c;
+        }
+        /* Demo Mode Badge */
+        .demo-mode-badge {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 1001;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Tutorial Overlay System */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            display: none;
+            pointer-events: none;
+        }
+        
+        .tutorial-overlay.active {
+            display: block;
+        }
+        
+        .tutorial-spotlight {
+            position: absolute;
+            border: 3px solid #667eea;
+            border-radius: 8px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            animation: pulse-border 2s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0%, 100% { border-color: #667eea; }
+            50% { border-color: #a78bfa; }
+        }
+        
+        .tutorial-tooltip {
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 380px;
+            z-index: 2001;
+            pointer-events: auto;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .tutorial-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1d1c1d;
+            margin-bottom: 8px;
+        }
+        
+        .tutorial-text {
+            font-size: 14px;
+            color: #616061;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        
+        .tutorial-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e2e2;
+        }
+        
+        .tutorial-steps {
+            font-size: 12px;
+            color: #616061;
+        }
+        
+        .tutorial-next-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tutorial-next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .tutorial-skip {
+            background: transparent;
+            color: #616061;
+            border: 1px solid #e2e2e2;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        
+        .tutorial-skip:hover {
+            background: #f8f8f8;
+        }
+        
+        .tutorial-pointer {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            animation: point 1s infinite;
+        }
+        
+        @keyframes point {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-5px, -5px); }
+        }
+        
+        .tutorial-highlight-circle {
+            position: absolute;
+            border: 3px solid #ff6b6b;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: pulse-circle 2s infinite;
+        }
+        
+        @keyframes pulse-circle {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% { 
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Mode Indicator -->
+    <div class="demo-mode-badge">DEMO MODE</div>
+    
+    <!-- Tutorial Overlay System -->
+    <div class="tutorial-overlay" id="tutorialOverlay">
+        <div class="tutorial-spotlight" id="tutorialSpotlight" style="display: none;"></div>
+        <div class="tutorial-highlight-circle" id="tutorialCircle" style="display: none;"></div>
+        <div class="tutorial-tooltip" id="tutorialTooltip">
+            <div class="tutorial-title" id="tutorialTitle">Welcome to Voltaic Motors Slack!</div>
+            <div class="tutorial-text" id="tutorialText">This is Hannah's workspace where the team collaborates on building cutting-edge electric motorcycles. Let's explore how to add TeamSync AI to optimize team chemistry.</div>
+            <div class="tutorial-progress">
+                <span class="tutorial-steps" id="tutorialSteps">Step 1 of 11</span>
+                <div>
+                    <button class="tutorial-skip" onclick="skipTutorial()">Skip Tour</button>
+                    <button class="tutorial-next-btn" onclick="nextTutorialStep()">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slack-container">
+        <!-- Far Left Icon Rail -->
+        <div class="icon-rail">
+            <div class="workspace-icon active">⚡</div>
+            <div class="rail-icon">🏠</div>
+            <div class="rail-icon">💬</div>
+            <div class="rail-icon">🔔</div>
+            <div class="rail-icon">📁</div>
+            <div class="rail-separator"></div>
+            <div class="rail-icon">⋯</div>
+            <div style="flex: 1;"></div>
+            <div class="add-workspace">+</div>
+            <div class="user-avatar-rail">
+                HR
+                <div class="online-indicator"></div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="workspace-header">
+                <div class="workspace-name">
+                    <span class="workspace-title">Voltaic Motors</span>
+                    <span class="workspace-dropdown">▼</span>
+                </div>
+            </div>
+            
+            <button class="compose-btn">✏️ New message</button>
+            
+            <div class="channels-section">
+                <!-- Channels -->
+                <div class="section-header">
+                    <span class="section-title">
+                        <span class="caret">▼</span>
+                        Channels
+                    </span>
+                </div>
+                
+                <div class="channel-item active" onclick="showChannel('general');">
+                    <span class="channel-icon">#</span>
+                    <span class="channel-name">general</span>
+                </div>
+                
+                <div class="channel-item" onclick="showChannel('engineering');">
+                    <span class="channel-icon">#</span>
+                    <span class="channel-name">engineering-core</span>
+                    <span class="unread-count">3</span>
+                </div>
+                
+                <div class="channel-item" onclick="showChannel('product');">
+                    <span class="channel-icon">#</span>
+                    <span class="channel-name">product-design</span>
+                </div>
+                
+                <div class="channel-item" onclick="showChannel('random');">
+                    <span class="channel-icon">#</span>
+                    <span class="channel-name">random</span>
+                </div>
+                
+                <div class="channel-item">
+                    <span class="add-channel">+</span>
+                    <span class="channel-name">Add channels</span>
+                </div>
+                
+                <!-- Direct Messages -->
+                <div class="section-header" style="margin-top: 20px;">
+                    <span class="section-title">
+                        <span class="caret">▼</span>
+                        Direct messages
+                    </span>
+                </div>
+                
+                <div class="channel-item" onclick="showChannel('dm');">
+                    <span class="dm-status online"></span>
+                    <span class="channel-name">Marcus Chen (CEO)</span>
+                </div>
+                
+                <div class="channel-item" onclick="showChannel('dm');">
+                    <span class="dm-status online"></span>
+                    <span class="channel-name">Sarah Johnson</span>
+                </div>
+                
+                <div class="channel-item" onclick="showChannel('dm');">
+                    <span class="dm-status offline"></span>
+                    <span class="channel-name">Alex Thompson</span>
+                </div>
+                
+                <div class="channel-item" onclick="showChannel('dm');">
+                    <span class="dm-status online"></span>
+                    <span class="channel-name">Emily Parker</span>
+                </div>
+                
+                <div class="channel-item">
+                    <span class="add-channel">+</span>
+                    <span class="channel-name">Add teammates</span>
+                </div>
+                
+                <!-- Apps -->
+                <div class="section-header" style="margin-top: 20px;">
+                    <span class="section-title">
+                        <span class="caret">▼</span>
+                        Apps
+                    </span>
+                </div>
+                
+                <div class="channel-item" onclick="showAppsDirectory();">
+                    <span class="add-channel">+</span>
+                    <span class="channel-name">Add apps</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="channel-header">
+                <div class="channel-header-left">
+                    <span class="channel-header-title"># general</span>
+                </div>
+                <div class="channel-info">
+                    <div class="header-icons">
+                        <span class="header-icon">👤</span>
+                        <span style="color: rgba(255, 255, 255, 0.7); font-size: 14px; margin-right: 16px;">12</span>
+                        <span class="header-icon">📌</span>
+                        <span class="header-icon">🔍</span>
+                        <span class="header-icon">ℹ️</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <div class="channel-intro">
+                    <h1># general</h1>
+                    <p>You created this channel on June 7th, 2022. This is the very beginning of the <strong>#general</strong> channel. This is the one channel that will always include everyone. It's a great spot for announcements and team-wide conversations. (<span class="edit-desc" style="color: #1264a3; cursor: pointer;">Edit description</span>)</p>
+                    <button class="add-people-btn">
+                        <span>👤+</span>
+                        <span>Add People to Channel</span>
+                    </button>
+                </div>
+                
+                <!-- Yesterday's messages -->
+                <div class="system-message">
+                    <span class="system-message-content">Yesterday</span>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar">MC</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Marcus Chen</span>
+                            <span class="message-time">9:15 AM</span>
+                        </div>
+                        <div class="message-text">Great news team! The Atlas prototype just completed its 1000-mile endurance test. Zero issues with the battery management system 🎉</div>
+                        <div class="add-reaction">
+                            <span class="reaction">
+                                <span class="reaction-emoji">🚀</span>
+                                <span class="reaction-count">5</span>
+                            </span>
+                            <span class="reaction">
+                                <span class="reaction-emoji">⚡</span>
+                                <span class="reaction-count">3</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #059669, #10b981);">EP</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Emily Parker</span>
+                            <span class="message-time">9:22 AM</span>
+                        </div>
+                        <div class="message-text">That's incredible! The instant torque response at highway speeds is matching our simulations perfectly</div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #dc2626, #f87171);">DW</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">David Wilson</span>
+                            <span class="message-time">11:45 AM</span>
+                        </div>
+                        <div class="message-text">Just finished converting a 1978 Honda CB750. The owner couldn't believe how quiet it runs now. Photos in #product-design</div>
+                        <div class="thread-info">
+                            <span>💬 2 replies</span>
+                            <span>Last reply 3:30 PM</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Today's messages -->
+                <div class="system-message">
+                    <span class="system-message-content">Today</span>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar">MC</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Marcus Chen</span>
+                            <span class="message-time">8:30 AM</span>
+                        </div>
+                        <div class="message-text">Morning everyone! Quick reminder that we're expanding the team. Hannah will be setting up our new marketing and sales units today</div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #7c3aed, #a78bfa);">HR</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Hannah Rodriguez</span>
+                            <span class="message-time">8:45 AM</span>
+                        </div>
+                        <div class="message-text">Thanks Marcus! I'm looking at tools to help build optimal team chemistry. We have amazing individual talent - now we need to ensure they work together seamlessly 🤝</div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #2563eb, #60a5fa);">SJ</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Sarah Johnson</span>
+                            <span class="message-time">9:02 AM</span>
+                        </div>
+                        <div class="message-text">Speaking of teams, the battery optimization we implemented last week is showing 12% efficiency improvement. Minnesota winter testing starts next month</div>
+                        <div class="add-reaction">
+                            <span class="reaction">
+                                <span class="reaction-emoji">❄️</span>
+                                <span class="reaction-count">2</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="newMessages"></div>
+            </div>
+            
+            <div class="message-input-container">
+                <div class="message-input-wrapper">
+                    <div class="input-toolbar">
+                        <button class="toolbar-btn" title="Bold">𝐁</button>
+                        <button class="toolbar-btn" title="Italic">𝐼</button>
+                        <button class="toolbar-btn" title="Strikethrough">S̶</button>
+                        <div class="toolbar-divider"></div>
+                        <button class="toolbar-btn" title="Link">🔗</button>
+                        <button class="toolbar-btn" title="Ordered List">1.</button>
+                        <button class="toolbar-btn" title="Bullet List">•</button>
+                        <button class="toolbar-btn" title="Blockquote">"</button>
+                        <div class="toolbar-divider"></div>
+                        <button class="toolbar-btn" title="Code">&lt;/&gt;</button>
+                        <button class="toolbar-btn" title="Code Block">{ }</button>
+                    </div>
+                    <textarea class="message-input" placeholder="Message #general" rows="1"></textarea>
+                    <div class="input-bottom-toolbar">
+                        <button class="toolbar-btn" title="Attachments">+</button>
+                        <button class="toolbar-btn" title="Formatting">Aa</button>
+                        <button class="toolbar-btn" title="Emoji">😊</button>
+                        <button class="toolbar-btn" title="Mention">@</button>
+                        <button class="toolbar-btn" title="Record Video">📹</button>
+                        <button class="toolbar-btn" title="Record Audio">🎤</button>
+                        <button class="toolbar-btn" title="Slash Commands">/</button>
+                        <div class="send-options">
+                            <button class="toolbar-btn" title="Send" style="color: #007a5a;">✔</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Apps Overlay -->
+        <div class="apps-overlay" id="appsOverlay">
+            <div class="apps-sidebar">
+                <div class="apps-menu-item active">
+                    <span>🏠</span>
+                    <span>App Directory Home</span>
+                </div>
+                <div class="apps-menu-item">
+                    <span>⭐</span>
+                    <span>Featured</span>
+                </div>
+                <div class="apps-menu-item">
+                    <span>📊</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="apps-menu-item">
+                    <span>🤝</span>
+                    <span>HR & Team</span>
+                </div>
+            </div>
+            
+            <div class="apps-main">
+                <button class="close-apps" onclick="closeAppsDirectory()">✕</button>
+                
+                <div class="apps-header">
+                    <h1 class="apps-title">Slack App Directory</h1>
+                    <p class="apps-subtitle">Supercharge your workspace with apps and integrations</p>
+                </div>
+                
+                <div class="apps-search">
+                    <input type="text" class="apps-search-input" id="appsSearchInput" placeholder="Search apps..." onkeyup="searchApps(event)">
+                </div>
+                
+                <div class="app-grid" id="appGrid">
+                    <div class="app-card">
+                        <div class="app-card-header">
+                            <div class="app-icon">📊</div>
+                            <div>
+                                <div class="app-name">Analytics Pro</div>
+                            </div>
+                        </div>
+                        <div class="app-description">Advanced analytics and reporting for your workspace metrics</div>
+                        <button class="app-install-btn">Add to Slack</button>
+                    </div>
+                    
+                    <div class="app-card">
+                        <div class="app-card-header">
+                            <div class="app-icon">📅</div>
+                            <div>
+                                <div class="app-name">Calendar Sync</div>
+                            </div>
+                        </div>
+                        <div class="app-description">Sync your Google Calendar and never miss a meeting</div>
+                        <button class="app-install-btn">Add to Slack</button>
+                    </div>
+                    
+                    <div class="app-card">
+                        <div class="app-card-header">
+                            <div class="app-icon">🎯</div>
+                            <div>
+                                <div class="app-name">Task Manager</div>
+                            </div>
+                        </div>
+                        <div class="app-description">Simple task management directly in Slack</div>
+                        <button class="app-install-btn">Add to Slack</button>
+                    </div>
+                </div>
+                
+                <div id="searchResults" style="display: none;">
+                    <h2 style="color: #fff; margin: 32px 0 16px;">Search Results</h2>
+                    <div class="app-grid" id="searchResultsGrid"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Installation Modal -->
+        <div class="install-modal" id="installModal">
+            <div class="install-dialog">
+                <div class="install-header">
+                    <div class="install-app-icon">TS</div>
+                    <div class="install-app-info">
+                        <h2>TeamSync AI</h2>
+                        <p>AI-powered team chemistry optimizer</p>
+                    </div>
+                </div>
+                
+                <div class="permissions-section">
+                    <div class="permissions-title">TeamSync AI will be able to:</div>
+                    <div class="permission-item">
+                        <span class="permission-icon">✓</span>
+                        <span>View basic information about public channels</span>
+                    </div>
+                    <div class="permission-item">
+                        <span class="permission-icon">✓</span>
+                        <span>Send messages as @TeamSync</span>
+                    </div>
+                    <div class="permission-item">
+                        <span class="permission-icon">✓</span>
+                        <span>Send direct messages to team members for quiz and results</span>
+                    </div>
+                    <div class="permission-item">
+                        <span class="permission-icon">✓</span>
+                        <span>Access team member profiles for chemistry analysis</span>
+                    </div>
+                </div>
+                
+                <div class="install-actions">
+                    <button class="install-cancel" onclick="closeInstallModal()">Cancel</button>
+                    <button class="install-confirm" onclick="confirmInstall()">Add to Slack</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentChannel = 'general';
+        let appsVisible = false;
+        
+        function showChannel(channel) {
+            // Update active state in sidebar
+            document.querySelectorAll('.channel-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find and activate the clicked channel
+            if (event) {
+                const clickedItem = event.currentTarget || event.target.closest('.channel-item');
+                if (clickedItem) {
+                    clickedItem.classList.add('active');
+                }
+            }
+            
+            // Update header
+            const headerTitle = document.querySelector('.channel-header-title');
+            if (channel === 'engineering') {
+                headerTitle.textContent = '# engineering-core';
+                loadEngineeringMessages();
+            } else if (channel === 'product') {
+                headerTitle.textContent = '# product-design';
+                loadProductMessages();
+            } else if (channel === 'random') {
+                headerTitle.textContent = '# random';
+                loadRandomMessages();
+            } else if (channel === 'dm') {
+                headerTitle.textContent = 'Marcus Chen';
+                loadDMMessages();
+            } else {
+                headerTitle.textContent = '# general';
+                if (channel === 'general') {
+                    // Just reset messages for general channel
+                    const container = document.getElementById('messagesContainer');
+                    if (container) {
+                        container.scrollTop = 0;
+                    }
+                }
+            }
+        }
+        
+        function loadEngineeringMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = `
+                <div class="system-message">
+                    <span class="system-message-content">Today</span>
+                </div>
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #059669, #10b981);">EP</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Emily Parker</span>
+                            <span class="message-time">7:45 AM</span>
+                        </div>
+                        <div class="message-text">New battery cells from Samsung SDI just arrived. Energy density is 15% higher than our current cells 🔋</div>
+                    </div>
+                </div>
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #0891b2, #06b6d4);">AT</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Alex Thompson</span>
+                            <span class="message-time">8:12 AM</span>
+                        </div>
+                        <div class="message-text">Running thermal tests now. Peak discharge at 120kW sustained for 30 seconds without thermal throttling</div>
+                    </div>
+                </div>
+                <div class="message">
+                    <div class="message-avatar">JR</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Jessica Rodriguez</span>
+                            <span class="message-time">8:30 AM</span>
+                        </div>
+                        <div class="message-text">Motor controller firmware v2.3 is ready. Regenerative braking efficiency up to 85% in city conditions</div>
+                    </div>
+                </div>`;
+        }
+        
+        function loadProductMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = `
+                <div class="system-message">
+                    <span class="system-message-content">Today</span>
+                </div>
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #dc2626, #f87171);">DW</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">David Wilson</span>
+                            <span class="message-time">9:00 AM</span>
+                        </div>
+                        <div class="message-text">New Atlas renders are ready! The matte carbon fiber finish with copper accents 🔥</div>
+                        <div class="message-text" style="margin-top: 8px;">[Motorcycle rendering image]</div>
+                    </div>
+                </div>
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #ea580c, #fb923c);">MJ</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Marcus Johnson</span>
+                            <span class="message-time">9:15 AM</span>
+                        </div>
+                        <div class="message-text">The integrated display UI is stunning. 0-60 acceleration visualization looks incredible</div>
+                    </div>
+                </div>`;
+        }
+        
+        function loadRandomMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = `
+                <div class="system-message">
+                    <span class="system-message-content">Today</span>
+                </div>
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #dc2626, #f87171);">DW</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">David Wilson</span>
+                            <span class="message-time">12:30 PM</span>
+                        </div>
+                        <div class="message-text">Anyone else see the new Rivian R1T doing the snow climb test? Electric torque is the future 💪</div>
+                    </div>
+                </div>
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #2563eb, #60a5fa);">SJ</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Sarah Johnson</span>
+                            <span class="message-time">12:45 PM</span>
+                        </div>
+                        <div class="message-text">Coffee machine is acting up again. Making espresso sounds like a motorcycle ironically 😅</div>
+                    </div>
+                </div>`;
+        }
+        
+        function loadDMMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = `
+                <div class="system-message">
+                    <span class="system-message-content">Today</span>
+                </div>
+                <div class="message">
+                    <div class="message-avatar">MC</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Marcus Chen</span>
+                            <span class="message-time">7:00 AM</span>
+                        </div>
+                        <div class="message-text">Hannah, excited to see the new team formations today. The marketing team will be crucial for our Q1 launch</div>
+                    </div>
+                </div>
+                <div class="message">
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #7c3aed, #a78bfa);">HR</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">You</span>
+                            <span class="message-time">7:15 AM</span>
+                        </div>
+                        <div class="message-text">Absolutely! I'm evaluating team chemistry tools. We need the marketing team to gel quickly for the Atlas launch campaign</div>
+                    </div>
+                </div>
+                <div class="message">
+                    <div class="message-avatar">MC</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">Marcus Chen</span>
+                            <span class="message-time">7:20 AM</span>
+                        </div>
+                        <div class="message-text">Perfect. Also need that two-person sales team ready. B2B partnerships will be key for fleet conversions</div>
+                    </div>
+                </div>`;
+        }
+        
+        function loadGeneralMessages() {
+            // Just return to avoid reload issues
+            return;
+        }
+        
+        function showAppsDirectory() {
+            document.getElementById('appsOverlay').classList.add('active');
+            document.getElementById('appsSearchInput').focus();
+        }
+        
+        function closeAppsDirectory() {
+            document.getElementById('appsOverlay').classList.remove('active');
+        }
+        
+        function searchApps(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            const appGrid = document.getElementById('appGrid');
+            const searchResults = document.getElementById('searchResults');
+            const searchResultsGrid = document.getElementById('searchResultsGrid');
+            
+            if (searchTerm.includes('team') || searchTerm.includes('sync') || searchTerm.includes('chemistry')) {
+                appGrid.style.display = 'none';
+                searchResults.style.display = 'block';
+                
+                searchResultsGrid.innerHTML = `
+                    <div class="app-card">
+                        <div class="app-card-header">
+                            <div class="app-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">TS</div>
+                            <div>
+                                <div class="app-name">TeamSync AI</div>
+                            </div>
+                        </div>
+                        <div class="app-description">AI-powered team chemistry optimizer. Run 2-minute assessments to instantly find optimal team configurations. Perfect for HR managers building high-performance teams.</div>
+                        <button class="app-install-btn" onclick="showInstallModal()">Add to Slack</button>
+                    </div>
+                    
+                    <div class="app-card">
+                        <div class="app-card-header">
+                            <div class="app-icon">👥</div>
+                            <div>
+                                <div class="app-name">Team Builder</div>
+                            </div>
+                        </div>
+                        <div class="app-description">Simple team formation tool for project management</div>
+                        <button class="app-install-btn">Add to Slack</button>
+                    </div>`;
+            } else if (searchTerm === '') {
+                appGrid.style.display = 'grid';
+                searchResults.style.display = 'none';
+            }
+        }
+        
+        function showInstallModal() {
+            document.getElementById('installModal').classList.add('active');
+        }
+        
+        function closeInstallModal() {
+            document.getElementById('installModal').classList.remove('active');
+        }
+        
+        function confirmInstall() {
+            // Close modal and apps directory
+            closeInstallModal();
+            closeAppsDirectory();
+            
+            // Show installation message
+            setTimeout(() => {
+                const newMessages = document.getElementById('newMessages');
+                if (newMessages) {
+                    newMessages.innerHTML = `
+                        <div class="system-message">
+                            <span class="system-message-content">TeamSync AI has been added to Voltaic Motors</span>
+                        </div>
+                        <div class="message">
+                            <div class="message-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">TS</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-author">TeamSync AI App</span>
+                                    <span class="bot-label">APP</span>
+                                    <span class="message-time">just now</span>
+                                </div>
+                                <div class="message-text">
+                                    🎉 Welcome to TeamSync AI! I'm here to help optimize your team chemistry.<br><br>
+                                    I can analyze team dynamics and find the perfect member combinations for maximum productivity.<br><br>
+                                    Ready to build your optimal teams? <span class="message-link" onclick="openDashboard()">Open TeamSync Dashboard →</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    
+                    // Scroll to bottom
+                    const container = document.getElementById('messagesContainer');
+                    if (container) {
+                        container.scrollTop = container.scrollHeight;
+                    }
+                    
+                    // Add Hannah's response after a delay
+                    setTimeout(() => {
+                        if (newMessages) {
+                            newMessages.innerHTML += `
+                                <div class="message">
+                                    <div class="message-avatar" style="background: linear-gradient(135deg, #7c3aed, #a78bfa);">HR</div>
+                                    <div class="message-content">
+                                        <div class="message-header">
+                                            <span class="message-author">Hannah Rodriguez</span>
+                                            <span class="message-time">just now</span>
+                                        </div>
+                                        <div class="message-text">Perfect timing! Let me set up the marketing team and sales dyad. This is exactly what we need 🚀</div>
+                                    </div>
+                                </div>`;
+                            if (container) {
+                                container.scrollTop = container.scrollHeight;
+                            }
+                        }
+                    }, 2000);
+                }
+            }, 500);
+        }
+        
+        function openDashboard() {
+            // Navigate to the dashboard
+            window.location.href = 'index.html?source=slack&installed=true';
+        }
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('appsOverlay').classList.contains('active')) {
+                closeAppsDirectory();
+            }
+            if (e.key === 'Escape' && document.getElementById('installModal').classList.contains('active')) {
+                closeInstallModal();
+            }
+        });
+        
+        // Tutorial System
+        let tutorialStep = 0;
+        const tutorialSteps = [
+            {
+                title: "Welcome to Voltaic Motors Slack!",
+                text: "This is Hannah's workspace where the team collaborates on building cutting-edge electric motorcycles. Let's explore how to add TeamSync AI to optimize team chemistry.",
+                action: () => {
+                    positionTooltip(window.innerWidth / 2 - 190, 100);
+                }
+            },
+            {
+                title: "Explore the Channels",
+                text: "These are the team channels. Click on #engineering-core to see what the engineering team is discussing.",
+                action: () => {
+                    const generalChannel = document.querySelectorAll('.channel-item')[0];
+                    if (generalChannel) {
+                        highlightElement(generalChannel);
+                        positionTooltip(300, 250);
+                        // Wait for user to click manually
+                    }
+                }
+            },
+            {
+                title: "Engineering Discussions",
+                text: "The engineering team is testing new battery cells and thermal management systems. Click #product-design to continue.",
+                action: () => {
+                    const engineeringChannel = document.querySelectorAll('.channel-item')[1];
+                    if (engineeringChannel) {
+                        highlightElement(engineeringChannel);
+                        positionTooltip(300, 250);
+                    }
+                }
+            },
+            {
+                title: "Product Design Channel",
+                text: "The design team is working on the Atlas motorcycle renders. Now let's go back to #general to add TeamSync.",
+                action: () => {
+                    const productChannel = document.querySelectorAll('.channel-item')[2];
+                    if (productChannel) {
+                        highlightElement(productChannel);
+                        positionTooltip(300, 290);
+                    }
+                }
+            },
+            {
+                title: "Back to General",
+                text: "Click #general to return to the main channel where Hannah mentioned needing team optimization tools.",
+                action: () => {
+                    const generalChannel = document.querySelectorAll('.channel-item')[0];
+                    if (generalChannel) {
+                        highlightElement(generalChannel);
+                        positionTooltip(300, 210);
+                    }
+                }
+            },
+            {
+                title: "Hannah's Request",
+                text: "Here's where Hannah mentioned looking for tools to build optimal team chemistry. This is the perfect use case for TeamSync!",
+                action: () => {
+                    setTimeout(() => {
+                        const hannahMessage = Array.from(document.querySelectorAll('.message')).find(msg => 
+                            msg.textContent.includes('looking at tools to help build optimal team chemistry'));
+                        if (hannahMessage) {
+                            hannahMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setTimeout(() => {
+                                circleElement(hannahMessage);
+                                positionTooltip(window.innerWidth - 420, 120);
+                            }, 500);
+                        }
+                    }, 300);
+                }
+            },
+            {
+                title: "Let's Add TeamSync",
+                text: "Now we'll add the TeamSync app to help Hannah build the perfect marketing team and sales dyad. Click 'Add apps' in the sidebar.",
+                action: () => {
+                    const addAppsBtn = Array.from(document.querySelectorAll('.channel-item')).find(item => 
+                        item.textContent.includes('Add apps'));
+                    if (addAppsBtn) {
+                        highlightElement(addAppsBtn);
+                        positionTooltip(300, 650);
+                    }
+                }
+            },
+            {
+                title: "Search for TeamSync",
+                text: "Type 'teamsync' in the search box to find the TeamSync AI app.",
+                action: () => {
+                    showAppsDirectory();
+                    setTimeout(() => {
+                        const searchInput = document.getElementById('appsSearchInput');
+                        if (searchInput) {
+                            highlightElement(searchInput);
+                            positionTooltip(window.innerWidth / 2 - 390, 380);
+                            // Auto-type animation
+                            setTimeout(() => {
+                                typeText(searchInput, 'teamsync', 100);
+                            }, 1000);
+                        }
+                    }, 300);
+                }
+            },
+            {
+                title: "TeamSync AI Found!",
+                text: "Here's TeamSync AI - the AI-powered team chemistry optimizer. Click 'Add to Slack' to install it.",
+                action: () => {
+                    setTimeout(() => {
+                        const appCard = document.querySelector('#searchResultsGrid .app-card');
+                        if (appCard) {
+                            highlightElement(appCard);
+                            positionTooltip(window.innerWidth / 2 - 390, 495);
+                        }
+                    }, 100);
+                }
+            },
+            {
+                title: "Review Permissions",
+                text: "TeamSync needs these permissions to analyze team chemistry and send quiz invitations. Click 'Add to Slack' to confirm.",
+                action: () => {
+                    showInstallModal();
+                    setTimeout(() => {
+                        const confirmBtn = document.querySelector('.install-confirm');
+                        if (confirmBtn) {
+                            highlightElement(confirmBtn);
+                            positionTooltip(window.innerWidth / 2 - 190, 620);
+                        }
+                    }, 300);
+                }
+            },
+            {
+                title: "Success! TeamSync is Installed",
+                text: "TeamSync AI App has joined your workspace! Click the dashboard link to start building optimal teams.",
+                action: () => {
+                    confirmInstall();
+                    setTimeout(() => {
+                        const dashboardLink = document.querySelector('.message-link');
+                        if (dashboardLink) {
+                            dashboardLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setTimeout(() => {
+                                circleElement(dashboardLink);
+                                positionTooltip(window.innerWidth - 420, 105);
+                            }, 500);
+                        }
+                    }, 3000);
+                }
+            }
+        ];
+        
+        function startTutorial() {
+            tutorialStep = 0;
+            document.getElementById('tutorialOverlay').classList.add('active');
+            showTutorialStep();
+        }
+        
+        function showTutorialStep() {
+            const step = tutorialSteps[tutorialStep];
+            document.getElementById('tutorialTitle').textContent = step.title;
+            document.getElementById('tutorialText').textContent = step.text;
+            document.getElementById('tutorialSteps').textContent = `Step ${tutorialStep + 1} of ${tutorialSteps.length}`;
+            
+            // Hide spotlight and circle by default
+            document.getElementById('tutorialSpotlight').style.display = 'none';
+            document.getElementById('tutorialCircle').style.display = 'none';
+            
+            // Execute step action
+            step.action();
+            
+            // Update button text for last step
+            const nextBtn = document.querySelector('.tutorial-next-btn');
+            if (tutorialStep === tutorialSteps.length - 1) {
+                nextBtn.textContent = 'Open Dashboard';
+                nextBtn.onclick = () => {
+                    openDashboard();
+                };
+            } else {
+                nextBtn.textContent = 'Next';
+                nextBtn.onclick = nextTutorialStep;
+            }
+        }
+        
+        function nextTutorialStep() {
+            tutorialStep++;
+            if (tutorialStep < tutorialSteps.length) {
+                showTutorialStep();
+            } else {
+                skipTutorial();
+            }
+        }
+        
+        function skipTutorial() {
+            document.getElementById('tutorialOverlay').classList.remove('active');
+            document.getElementById('tutorialSpotlight').style.display = 'none';
+            document.getElementById('tutorialCircle').style.display = 'none';
+        }
+        
+        function highlightElement(element) {
+            if (!element) return;
+            const rect = element.getBoundingClientRect();
+            const spotlight = document.getElementById('tutorialSpotlight');
+            spotlight.style.display = 'block';
+            spotlight.style.left = rect.left - 5 + 'px';
+            spotlight.style.top = rect.top - 5 + 'px';
+            spotlight.style.width = rect.width + 10 + 'px';
+            spotlight.style.height = rect.height + 10 + 'px';
+        }
+        
+        function circleElement(element) {
+            if (!element) return;
+            const rect = element.getBoundingClientRect();
+            const circle = document.getElementById('tutorialCircle');
+            circle.style.display = 'block';
+            circle.style.left = rect.left - 10 + 'px';
+            circle.style.top = rect.top - 10 + 'px';
+            circle.style.width = rect.width + 20 + 'px';
+            circle.style.height = rect.height + 20 + 'px';
+        }
+        
+        function positionTooltip(x, y) {
+            const tooltip = document.getElementById('tutorialTooltip');
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+        
+        function typeText(input, text, delay) {
+            input.value = '';
+            let index = 0;
+            const typeChar = () => {
+                if (index < text.length) {
+                    input.value += text[index];
+                    index++;
+                    // Trigger the search
+                    const event = new KeyboardEvent('keyup', {
+                        bubbles: true,
+                        cancelable: true,
+                    });
+                    input.dispatchEvent(event);
+                    searchApps({ target: input });
+                    setTimeout(typeChar, delay);
+                }
+            };
+            typeChar();
+        }
+        
+        // Auto-start tutorial after page loads
+        window.addEventListener('load', () => {
+            setTimeout(startTutorial, 1000);
+        });
+    </script>
+</body>
+</html>
